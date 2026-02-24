@@ -81,9 +81,9 @@ microservice-chart:
   secretProviderClass:
     create: false
   keyvault:
-    name: "pagopa-u-kv" #to change
-    tenantId: "7788edaf-0346-4068-9d79-c868aed15b3d" #to change
+    name: "pagopa-u-shared-kv" 
+    tenantId: "7788edaf-0346-4068-9d79-c868aed15b3d" 
   azure:
-    workloadIdentityClientId: "449c5b65-f368-487a-881a-b03676420c53" #to change
+    workloadIdentityClientId: "edc91a2b-534d-4f7f-9f2b-7924cd3a2711"
   canaryDelivery:
     create: false
