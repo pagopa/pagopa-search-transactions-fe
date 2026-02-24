@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './page.module.css';
 import {
   Alert,
@@ -20,6 +20,7 @@ import SectionHeader from './components/SectionHeader';
 import { searchCieTransactions } from './utils/api/client';
 import { validateSearchInput } from './utils/validators';
 import { CiePaymentTransaction } from './types/CieSearch';
+import { parseCieFragment } from './utils/utils/fragment';
 
 type ViewMode = 'search' | 'results';
 
@@ -60,8 +61,12 @@ export default function Home() {
     setErrorMsg(null);
   };
 
-  const handleSubmitSearch = async () => {
-    const validationError = validateSearchInput(form);
+   const handleSubmitSearch = async (
+    override?: SearchFormValues,
+    token?: string
+   ) => {
+    const input = override ?? form;
+    const validationError = validateSearchInput(input);
     if (validationError) {
       setErrorMsg(validationError);
       return;
@@ -72,9 +77,10 @@ export default function Home() {
 
     try {
       const response = await searchCieTransactions({
-        enteFiscalCode: form.enteFiscalCode.trim().toUpperCase(),
-        citizenFiscalCode: form.citizenFiscalCode.trim().toUpperCase(),
-        nav: form.nav.trim(),
+        enteFiscalCode: input.enteFiscalCode.trim().toUpperCase(),
+        citizenFiscalCode: input.citizenFiscalCode.trim().toUpperCase(),
+        nav: input.nav.trim(),
+        token,
       });
 
       setResults(response.transactions);
@@ -88,10 +94,27 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    const parsed = parseCieFragment(window.location.hash);
+    if (!parsed) return;
+
+    const nextForm = {
+      enteFiscalCode: parsed.enteFiscalCode.toUpperCase(),
+      citizenFiscalCode: parsed.citizenFiscalCode.toUpperCase(),
+      nav: parsed.nav,
+    };
+
+    setForm(nextForm);
+
+    void handleSubmitSearch(nextForm, parsed.token);
+  }, []);
+
   return (
     <div className={styles.page}>
       <HeaderAccount
         rootLink={pagoPALink}
+        enableLogin={false}
+        enableAssistanceButton={false}
         onAssistanceClick={() => console.log('Assistenza')}
         onLogin={() => console.log('Login')}
       />

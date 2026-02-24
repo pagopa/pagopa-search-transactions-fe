@@ -21,10 +21,12 @@ function splitDateTime(iso?: string) {
 }
 
 function statusColor(status: string): 'success' | 'error' | 'warning' | 'default' {
-  const s = status.toUpperCase();
-  if (s.includes('PAGATO')) return 'success';
-  if (s.includes('NON PAGATO') || s.includes('NON_PAGATO')) return 'error';
+  const s = status.toUpperCase().trim().replace(/\s+/g, '_');
+
+  if (s === 'NON_PAGATO') return 'error';
   if (s.includes('ATTESA')) return 'warning';
+  if (s === 'PAGATO') return 'success';
+
   return 'default';
 }
 
@@ -71,11 +73,19 @@ export default function ResultsTable({ rows, onBack, onOpenProof }: Props) {
       width: 170,
       sortable: false,
       filterable: false,
-      renderCell: (params) => (
-        <Button size="small" variant="outlined" onClick={() => onOpenProof(params.row)}>
-          Visualizza
-        </Button>
-      ),
+      renderCell: (params) => {
+        const row = params.row as CiePaymentTransaction;
+        const s = String(row.status ?? '').toUpperCase().replace(/\s+/g, '_');
+        const canOpenProof = s === 'PAGATO' && !!row.proof;
+
+        if (!canOpenProof) return <span>-</span>;
+
+        return (
+          <Button size="small" variant="outlined" onClick={() => onOpenProof(row)}>
+            Visualizza
+          </Button>
+        );
+      }
     },
   ];
 

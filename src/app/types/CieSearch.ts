@@ -6,9 +6,10 @@ export type PaymentStatus =
   | string;
 
 export interface SearchCieTransactionsRequest {
-  enteFiscalCode: string;      
-  citizenFiscalCode: string;   
+  enteFiscalCode: string;
+  citizenFiscalCode: string;
   nav: string;
+  token?: string;
 }
 
 export interface PaymentProof {
