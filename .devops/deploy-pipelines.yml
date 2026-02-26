@@ -94,7 +94,7 @@ stages:
                     DO_DEPLOY: true
                     ENV: 'DEV'
                     KUBERNETES_SERVICE_CONN: $(DEV_KUBERNETES_SERVICE_CONN)
-                    NAMESPACE: ecommerce
+                    NAMESPACE: shared
                     APP_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
                     VALUE_FILE: "helm/values-dev.yaml"
                     GREEN_VERSION: $(Build.SourceVersion)
@@ -209,7 +209,7 @@ stages:
                     DO_BLUE_GREEN_DEPLOY: false
                     ENV: 'UAT'
                     KUBERNETES_SERVICE_CONN: $(UAT_KUBERNETES_SERVICE_CONN)
-                    NAMESPACE: ecommerce
+                    NAMESPACE: shared
                     APP_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
                     VALUE_FILE: "helm/values-uat.yaml"
                     GREEN_VERSION: $(app_version)
@@ -304,7 +304,7 @@ stages:
                     DO_BLUE_GREEN_DEPLOY: false
                     ENV: 'PROD'
                     KUBERNETES_SERVICE_CONN: $(PROD_KUBERNETES_SERVICE_CONN)
-                    NAMESPACE: ecommerce
+                    NAMESPACE: shared
                     APP_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
                     VALUE_FILE: "helm/values-prod.yaml"
                     GREEN_VERSION: $(prod_version)
@@ -347,7 +347,7 @@ stages:
             displayName: Helm Rollback PROD
             inputs:
               kubernetesServiceEndpoint: $(PROD_KUBERNETES_SERVICE_CONN)
-              namespace: ecommerce
+              namespace: shared
               command: rollback
               chartName: $(K8S_IMAGE_REPOSITORY_NAME)
               releaseName: $(K8S_IMAGE_REPOSITORY_NAME)

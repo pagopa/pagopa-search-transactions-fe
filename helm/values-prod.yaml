@@ -1,5 +1,5 @@
 microservice-chart:
-  namespace: "ecommerce"
+  namespace: "shared"
   nameOverride: ""
   fullnameOverride: "pagopa-search-transactions-fe"
   image:
@@ -31,11 +31,11 @@ microservice-chart:
       - 3000
   ingress:
     create: true
-    host: "weuprod.ecommerce.internal.platform.pagopa.it"
+    host: "weuprod.shared.internal.platform.pagopa.it"
     path: /pagopa-search-transactions-fe/(.*)
     servicePort: 3000
   serviceAccount:
-    name: "ecommerce-workload-identity"
+    name: "shared-workload-identity"
   podAnnotations: {}
   podSecurityContext:
     seccompProfile:
