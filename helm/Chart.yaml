@@ -3,7 +3,7 @@ type: application
 version: 2.8.0
 appVersion: "1.8.0"
 name: pagopa-search-transactions-fe
-description: Rect Typescript frontend application designed to support CIE transactions payment
+description: React Typescript frontend application designed to support CIE transactions payment
 dependencies:
   - name: microservice-chart
     repository: "https://pagopa.github.io/aks-microservice-chart-blueprint"
