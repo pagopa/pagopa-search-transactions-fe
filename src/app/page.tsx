@@ -1,46 +1,39 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styles from './page.module.css';
 import {
   Alert,
   Box,
-  CircularProgress,
   Container,
   Dialog,
   DialogContent,
   DialogTitle,
   Paper,
+  Typography,
+  Grid,
 } from '@mui/material';
 import { HeaderAccount, HeaderProduct, RootLinkType } from '@pagopa/mui-italia';
-import SearchForm, { SearchFormValues } from './components/SearchForm';
+
 import ResultsTable from './components/ResultsTable';
-import SectionDivider from './components/SectionDivider';
-import SectionHeader from './components/SectionHeader';
+import FullPageLoader from './components/FullPageLoader';
+import FullPageError from './components/FullPageError';
+
 import { searchCieTransactions } from './utils/api/client';
 import { validateSearchInput } from './utils/validators';
 import { CiePaymentTransaction } from './types/CieSearch';
-import { parseCieFragment } from './utils/utils/fragment';
-
-type ViewMode = 'search' | 'results';
-
-const DEFAULT_CF_ENTE = process.env.NEXT_PUBLIC_DEFAULT_CF_ENTE ?? '';
+import { parseCieFragment, FragmentPayload } from './utils/utils/fragment';
 
 export default function Home() {
-  const [view, setView] = useState<ViewMode>('search');
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const [form, setForm] = useState<SearchFormValues>({
-    enteFiscalCode: DEFAULT_CF_ENTE,
-    citizenFiscalCode: '',
-    nav: '',
-  });
-
-  const [lastSearch, setLastSearch] = useState<SearchFormValues | null>(null);
+  const [payload, setPayload] = useState<FragmentPayload | null>(null);
   const [results, setResults] = useState<CiePaymentTransaction[]>([]);
+  const [error, setError] = useState<{ title: string; description?: string } | null>(null);
 
   const [selectedProofRow, setSelectedProofRow] = useState<CiePaymentTransaction | null>(null);
+
+  const didRun = useRef(false);
 
   const pagoPALink: RootLinkType = useMemo(
     () => ({
@@ -52,62 +45,65 @@ export default function Home() {
     []
   );
 
-  const handleClear = () => {
-    setForm((prev) => ({
-      enteFiscalCode: prev.enteFiscalCode, // mantieni CF ente precompilato
-      citizenFiscalCode: '',
-      nav: '',
-    }));
-    setErrorMsg(null);
-  };
+  const runCheck = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    setResults([]);
 
-   const handleSubmitSearch = async (
-    override?: SearchFormValues,
-    token?: string
-   ) => {
-    const input = override ?? form;
-    const validationError = validateSearchInput(input);
-    if (validationError) {
-      setErrorMsg(validationError);
+    const parsed = parseCieFragment(window.location.hash);
+    if (!parsed) {
+      setPayload(null);
+      setError({
+        title: 'Parametri mancanti',
+        description:
+          'Apri questa pagina dal gestionale CIE tramite redirect (CF Ente, CF Cittadino e NAV devono essere nel fragment URL).',
+      });
+      setLoading(false);
       return;
     }
 
-    setErrorMsg(null);
-    setLoading(true);
+    setPayload(parsed);
+
+    const input = {
+      enteFiscalCode: parsed.enteFiscalCode.trim().toUpperCase(),
+      citizenFiscalCode: parsed.citizenFiscalCode.trim().toUpperCase(),
+      nav: parsed.nav.trim(),
+    };
+
+    const validationError = validateSearchInput(input);
+    if (validationError) {
+      setError({
+        title: 'Parametri non validi',
+        description: validationError,
+      });
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await searchCieTransactions({
-        enteFiscalCode: input.enteFiscalCode.trim().toUpperCase(),
-        citizenFiscalCode: input.citizenFiscalCode.trim().toUpperCase(),
-        nav: input.nav.trim(),
-        token,
+        ...input,
+        token: parsed.token,
       });
 
       setResults(response.transactions);
-      setLastSearch(form);
-      setView('results');
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'Errore durante la ricerca';
-      setErrorMsg(message);
+      const message = e instanceof Error ? e.message : 'Errore durante la verifica del pagamento';
+      setError({
+        title: 'Errore durante la verifica',
+        description: message,
+      });
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    const parsed = parseCieFragment(window.location.hash);
-    if (!parsed) return;
+    if (didRun.current) return;
+    didRun.current = true;
 
-    const nextForm = {
-      enteFiscalCode: parsed.enteFiscalCode.toUpperCase(),
-      citizenFiscalCode: parsed.citizenFiscalCode.toUpperCase(),
-      nav: parsed.nav,
-    };
-
-    setForm(nextForm);
-
-    void handleSubmitSearch(nextForm, parsed.token);
-  }, []);
+    void runCheck();
+  }, [runCheck]);
 
   return (
     <div className={styles.page}>
@@ -123,7 +119,7 @@ export default function Home() {
         chipLabel="Beta"
         productsList={[
           {
-            title: 'Ricerca pagamenti CIE',
+            title: 'Verifica pagamenti CIE',
             id: 'cie-search',
             productUrl: '',
             linkType: 'internal',
@@ -133,53 +129,66 @@ export default function Home() {
 
       <main className={styles.main}>
         <Container maxWidth="lg">
-          <SectionHeader
-            icon=""
-            title="Portale ricerca transazioni CIE"
-            subtitle="Ricerca per CF Ente, CF Cittadino e Numero Avviso"
-          />
+          <Paper sx={{ p: 2 }}>
+            {loading && <FullPageLoader label="Verifica pagamento in corso…" />}
 
-          <Paper
-            sx={{
-              p: 2,
-            }}
-          >
-            {view === 'search' && (
-              <SearchForm
-                values={form}
-                onChange={setForm}
-                onSubmit={handleSubmitSearch}
-                onClear={handleClear}
-                loading={loading}
-                error={errorMsg}
+            {!loading && error && (
+              <FullPageError
+                title={error.title}
+                description={error.description}
+                onBack={() => window.history.back()}
+                onRetry={() => void runCheck()}
               />
             )}
 
-            {view === 'results' && (
+            {!loading && !error && payload && (
               <>
-                {loading ? (
-                  <Box display="flex" justifyContent="center" alignItems="center" minHeight={240}>
-                    <CircularProgress />
-                  </Box>
-                ) : results.length === 0 ? (
-                  <Box>
-                    <Alert severity="info" sx={{ mb: 2 }}>
-                      Nessuna transazione di pagamento trovata per il num avviso {lastSearch?.nav ?? '-'}
-                    </Alert>
-                    <Box textAlign="right">
-                      <button
-                        type="button"
-                        onClick={() => setView('search')}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        ← Torna alla pagina di ricerca
-                      </button>
-                    </Box>
-                  </Box>
+                <Box mb={2}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                    Dati richiesta
+                  </Typography>
+
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={4}>
+                      <Typography variant="caption" color="text.secondary">
+                        CF Ente
+                      </Typography>
+                      <Typography>{payload.enteFiscalCode.toUpperCase()}</Typography>
+                    </Grid>
+
+                    <Grid item xs={12} md={4}>
+                      <Typography variant="caption" color="text.secondary">
+                        CF Cittadino
+                      </Typography>
+                      <Typography>{payload.citizenFiscalCode.toUpperCase()}</Typography>
+                    </Grid>
+
+                    <Grid item xs={12} md={4}>
+                      <Typography variant="caption" color="text.secondary">
+                        Numero avviso / NAV
+                      </Typography>
+                      <Typography>{payload.nav}</Typography>
+                    </Grid>
+
+                    {payload.requestType && (
+                      <Grid item xs={12} md={4}>
+                        <Typography variant="caption" color="text.secondary">
+                          Tipologia richiesta
+                        </Typography>
+                        <Typography>{payload.requestType}</Typography>
+                      </Grid>
+                    )}
+                  </Grid>
+                </Box>
+
+                {results.length === 0 ? (
+                  <Alert severity="info">
+                    Nessuna transazione di pagamento trovata per il numero avviso <b>{payload.nav}</b>.
+                  </Alert>
                 ) : (
                   <ResultsTable
                     rows={results}
-                    onBack={() => setView('search')}
+                    onBack={() => window.history.back()}
                     onOpenProof={(row) => setSelectedProofRow(row)}
                   />
                 )}
@@ -187,33 +196,27 @@ export default function Home() {
             )}
           </Paper>
 
-          {errorMsg && view === 'results' && (
-            <Alert severity="error" sx={{ mt: 2 }}>
-              {errorMsg}
-            </Alert>
-          )}
+          <Dialog
+            open={Boolean(selectedProofRow)}
+            onClose={() => setSelectedProofRow(null)}
+            maxWidth="md"
+            fullWidth
+          >
+            <DialogTitle>Prova di pagamento</DialogTitle>
+            <DialogContent>
+              {selectedProofRow?.proof?.receiptUrl ? (
+                <a href={selectedProofRow.proof.receiptUrl} target="_blank" rel="noreferrer">
+                  Apri ricevuta / prova di pagamento
+                </a>
+              ) : (
+                <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0 }}>
+                  {JSON.stringify(selectedProofRow?.proof?.rawPayload ?? selectedProofRow, null, 2)}
+                </pre>
+              )}
+            </DialogContent>
+          </Dialog>
         </Container>
       </main>
-
-      <Dialog
-        open={Boolean(selectedProofRow)}
-        onClose={() => setSelectedProofRow(null)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>Prova di pagamento</DialogTitle>
-        <DialogContent>
-          {selectedProofRow?.proof?.receiptUrl ? (
-            <a href={selectedProofRow.proof.receiptUrl} target="_blank" rel="noreferrer">
-              Apri ricevuta / prova di pagamento
-            </a>
-          ) : (
-            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0 }}>
-              {JSON.stringify(selectedProofRow?.proof?.rawPayload ?? selectedProofRow, null, 2)}
-            </pre>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

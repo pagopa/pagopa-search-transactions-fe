@@ -46,7 +46,6 @@ export async function searchCieTransactions(
   const nav = payload.nav.trim();
   const last = nav.slice(-1);
 
-  // Simula errore backend
   if (nav.endsWith('999')) {
     throw new Error('Errore mock backend (simulato)');
   }
@@ -56,7 +55,6 @@ export async function searchCieTransactions(
     return { transactions: [] };
   }
 
-  // Risposta con più righe / stati
   const now = new Date();
   const iso = (minutesAgo: number) =>
     new Date(now.getTime() - minutesAgo * 60_000).toISOString();

@@ -92,10 +92,8 @@ export default function ResultsTable({ rows, onBack, onOpenProof }: Props) {
   return (
     <Box>
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-        <h3 style={{ margin: 0 }}>Risultati ricerca</h3>
-        <Button variant="text" onClick={onBack}>
-          ← Torna alla ricerca
-        </Button>
+        <h3 style={{ margin: 0 }}>Esito verifica pagamento</h3>
+
       </Stack>
 
       <Box sx={{ height: 420, width: '100%' }}>
@@ -107,6 +105,7 @@ export default function ResultsTable({ rows, onBack, onOpenProof }: Props) {
           initialState={{
             pagination: { paginationModel: { page: 0, pageSize: 10 } },
           }}
+          showToolbar
         />
       </Box>
     </Box>
