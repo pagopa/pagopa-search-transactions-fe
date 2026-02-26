@@ -7,4 +7,4 @@ description: React Typescript frontend application designed to support CIE trans
 dependencies:
   - name: microservice-chart
     repository: "https://pagopa.github.io/aks-microservice-chart-blueprint"
-    version: 8.0.0
+    version: 8.1.1
