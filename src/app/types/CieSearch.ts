@@ -1,32 +1,20 @@
-export type PaymentStatus =
-  | 'PAGATO'
-  | 'NON_PAGATO'
-  | 'IN_ATTESA'
-  | 'ANNULLATO'
-  | string;
-
-export interface SearchCieTransactionsRequest {
-  enteFiscalCode: string;
-  citizenFiscalCode: string;
+export interface CiePaidNoticeRequest {
+  organizationFiscalCode: string;
+  debtorFiscalCode: string;
   nav: string;
   token?: string;
 }
 
-export interface PaymentProof {
-  receiptUrl?: string;
-  rawPayload?: unknown;
+export interface UserDetail {
+  name?: string;
+  taxCode: string;
 }
 
-export interface CiePaymentTransaction {
-  id: string;
-  nav: string;
-  transactionId?: string;
-  paymentDateTime?: string;
-  status: PaymentStatus;
-  trackingInfo?: string;
-  proof?: PaymentProof;
-}
-
-export interface SearchCieTransactionsResponse {
-  transactions: CiePaymentTransaction[];
+export interface CiePaidNoticeDetail {
+  subject?: string;
+  amount?: number | string;
+  debtor?: UserDetail;
+  payee?: UserDetail;
+  refNumberType?: string;
+  refNumberValue?: string;
 }

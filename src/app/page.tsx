@@ -1,37 +1,26 @@
-'use client';
+"use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styles from './page.module.css';
-import {
-  Alert,
-  Box,
-  Container,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Paper,
-  Typography,
-  Grid,
-} from '@mui/material';
+import { Alert, Box, Button, Container, Grid, Paper, Typography } from '@mui/material';
 import { HeaderAccount, HeaderProduct, RootLinkType } from '@pagopa/mui-italia';
 
-import ResultsTable from './components/ResultsTable';
 import FullPageLoader from './components/FullPageLoader';
 import FullPageError from './components/FullPageError';
+import PaidNoticeResult from './components/PaidNoticeResult';
 
-import { searchCieTransactions } from './utils/api/client';
+import { getPaidNoticeDetail } from './utils/api/client';
 import { validateSearchInput } from './utils/validators';
-import { CiePaymentTransaction } from './types/CieSearch';
 import { parseCieFragment, FragmentPayload } from './utils/utils/fragment';
+import { CiePaidNoticeDetail } from './types/CieSearch';
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const [payload, setPayload] = useState<FragmentPayload | null>(null);
-  const [results, setResults] = useState<CiePaymentTransaction[]>([]);
+  const [result, setResult] = useState<CiePaidNoticeDetail | null>(null);
+  const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<{ title: string; description?: string } | null>(null);
-
-  const [selectedProofRow, setSelectedProofRow] = useState<CiePaymentTransaction | null>(null);
 
   const didRun = useRef(false);
 
@@ -48,7 +37,8 @@ export default function Home() {
   const runCheck = useCallback(async () => {
     setLoading(true);
     setError(null);
-    setResults([]);
+    setResult(null);
+    setNotFound(false);
 
     const parsed = parseCieFragment(window.location.hash);
     if (!parsed) {
@@ -81,12 +71,20 @@ export default function Home() {
     }
 
     try {
-      const response = await searchCieTransactions({
-        ...input,
+      const response = await getPaidNoticeDetail({
+        organizationFiscalCode: input.enteFiscalCode,
+        debtorFiscalCode: input.citizenFiscalCode,
+        nav: input.nav,
         token: parsed.token,
       });
 
-      setResults(response.transactions);
+      if (response) {
+        setResult(response);
+        setNotFound(false);
+      } else {
+        setResult(null);
+        setNotFound(true);
+      }
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Errore durante la verifica del pagamento';
       setError({
@@ -101,7 +99,6 @@ export default function Home() {
   useEffect(() => {
     if (didRun.current) return;
     didRun.current = true;
-
     void runCheck();
   }, [runCheck]);
 
@@ -181,40 +178,26 @@ export default function Home() {
                   </Grid>
                 </Box>
 
-                {results.length === 0 ? (
-                  <Alert severity="info">
-                    Nessuna transazione di pagamento trovata per il numero avviso <b>{payload.nav}</b>.
-                  </Alert>
-                ) : (
-                  <ResultsTable
-                    rows={results}
-                    onBack={() => window.history.back()}
-                    onOpenProof={(row) => setSelectedProofRow(row)}
-                  />
+                {notFound && (
+                  <Box>
+                    <Alert severity="warning" sx={{ mb: 2 }}>
+                      Pagamento non trovato per il numero avviso <b>{payload.nav}</b>.
+                    </Alert>
+
+                    <Box display="flex" justifyContent="flex-end">
+                      <Button variant="outlined" onClick={() => window.history.back()}>
+                        Indietro
+                      </Button>
+                    </Box>
+                  </Box>
+                )}
+
+                {!notFound && result && (
+                  <PaidNoticeResult detail={result} onBack={() => window.history.back()} />
                 )}
               </>
             )}
           </Paper>
-
-          <Dialog
-            open={Boolean(selectedProofRow)}
-            onClose={() => setSelectedProofRow(null)}
-            maxWidth="md"
-            fullWidth
-          >
-            <DialogTitle>Prova di pagamento</DialogTitle>
-            <DialogContent>
-              {selectedProofRow?.proof?.receiptUrl ? (
-                <a href={selectedProofRow.proof.receiptUrl} target="_blank" rel="noreferrer">
-                  Apri ricevuta / prova di pagamento
-                </a>
-              ) : (
-                <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0 }}>
-                  {JSON.stringify(selectedProofRow?.proof?.rawPayload ?? selectedProofRow, null, 2)}
-                </pre>
-              )}
-            </DialogContent>
-          </Dialog>
         </Container>
       </main>
     </div>

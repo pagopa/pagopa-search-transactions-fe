@@ -1,5 +1,3 @@
-'use client';
-
 import { ThemeProvider } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 

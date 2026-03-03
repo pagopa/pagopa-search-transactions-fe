@@ -3,13 +3,15 @@ export interface FragmentPayload {
   citizenFiscalCode: string;
   nav: string;
   token?: string;
-  requestType?: string; // PRIMA_EMISSIONE / RINNOVO / SMARRIMENTO (opzionale)
+  requestType?: string;
 }
 
 const aliases = {
   enteFiscalCode: ['cfEnte', 'enteFiscalCode', 'codiceFiscaleEnte', 'cf-org'],
   citizenFiscalCode: [
     'cfCittadino',
+    'cf-cit',
+    'cfCit',
     'citizenFiscalCode',
     'codiceFiscaleDebitore',
     'codiceFiscalePagatore',
@@ -42,7 +44,7 @@ export function parseCieFragment(hash: string): FragmentPayload | null {
   const trimmed = raw.trim();
   if (!trimmed) return null;
 
-  // 1) Caso key=value (o key@value) &key=value...
+  // 1) key=value (or key@value) &key=value...
   const looksKeyValue = trimmed.includes('=') || /[a-zA-Z0-9_-]+@[^&]+/.test(trimmed);
   if (looksKeyValue) {
     const normalized = trimmed.replace(/@/g, '=');
@@ -63,7 +65,7 @@ export function parseCieFragment(hash: string): FragmentPayload | null {
     };
   }
 
-  // 2) Fallback posizionale: #<cfEnte>&<cfCittadino>&<nav>&<token?>&<requestType?>
+  // 2) positional: #<cfEnte>&<cfCittadino>&<nav>&<token?>&<requestType?>
   const parts = trimmed
     .split('&')
     .map((p) => safeDecode(p.trim()))

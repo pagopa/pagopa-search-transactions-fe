@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Alert, AlertTitle, Box, Button, Stack } from '@mui/material';
+import { Alert, AlertTitle, Box } from '@mui/material';
 
 type Props = {
   title: string;
