@@ -65,15 +65,14 @@ export async function getPaidNoticeDetail(
     };
   }
 
-  /*
-  const url = `${API_BASE_URL}/paids/organizations/${encodeURIComponent(payload.organizationFiscalCode)}/notices/${encodeURIComponent(
+  
+  const url = `${API_BASE_URL}/transactions/organizations/${encodeURIComponent(payload.organizationFiscalCode)}/notices/${encodeURIComponent(
     payload.nav
   )}`;
-  */
+  
 
-  const url = `/api/be/paids/organizations/${encodeURIComponent(payload.organizationFiscalCode)}/notices/${encodeURIComponent(
-    payload.nav
-  )}`;
+  //const url = `/api/be/transactions/organizations/${encodeURIComponent(payload.organizationFiscalCode)}/notices/${encodeURIComponent(payload.nav)}`;
+
 
   console.log(`Fetching paid notice detail from API: ${url}`);
 
@@ -82,8 +81,8 @@ export async function getPaidNoticeDetail(
     cache: 'no-store',
     headers: {
       'Content-Type': 'application/json',
-      // Backend expects cf-cit
-      'cf-cit': payload.debtorFiscalCode,
+      // Backend expects x-fiscal-code
+      'x-fiscal-code': payload.debtorFiscalCode,
       ...(payload.token ? { 'x-cie-token': payload.token } : {}),
     },
   });

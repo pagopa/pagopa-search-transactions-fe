@@ -11,7 +11,7 @@ import PaidNoticeResult from './components/PaidNoticeResult';
 
 import { getPaidNoticeDetail } from './utils/api/client';
 import { validateSearchInput } from './utils/validators';
-import { parseCieFragment, FragmentPayload } from './utils/utils/fragment';
+import { parseCieFragment, FragmentPayload } from './utils/fragment';
 import { CiePaidNoticeDetail } from './types/CieSearch';
 
 export default function Home() {
