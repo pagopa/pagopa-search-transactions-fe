@@ -1,0 +1,109 @@
+parameters:
+  - name: 'BUILD'
+    displayName: 'Build'
+    type: boolean
+    default: true
+
+  - name: 'STATIC_ANALISYS'
+    displayName: 'Static analisys'
+    type: boolean
+    default: true
+
+  - name: 'UNIT_TESTS'
+    displayName: 'Unit tests'
+    type: boolean
+    default: true
+    
+variables:
+  NODE_VERSION: '22.13.1'
+  YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
+
+trigger:
+ branches:
+  include:
+    - main
+
+pool:
+  vmImage: 'ubuntu-22.04'
+
+resources:
+  repositories:
+    - repository: pagopaCommons
+      type: github
+      name: pagopa/azure-pipeline-templates
+      ref: refs/tags/v19
+      endpoint: 'io-azure-devops-github-ro'
+
+stages:
+  - stage: Build
+    condition: and(succeeded(), eq('${{parameters.BUILD}}', true))
+    dependsOn: []
+    jobs:
+      - job: make_build
+        steps:
+        - template: templates/node-job-setup/template.yaml@pagopaCommons
+
+        - script: |
+            yarn build
+          displayName: 'Build'
+
+  - stage: Static_Analysis
+    condition: and(succeeded(), eq('${{parameters.STATIC_ANALISYS}}', true))
+    dependsOn: []
+    jobs:
+      - job: lint
+        steps:
+        - template: templates/node-job-setup/template.yaml@pagopaCommons
+        - script: yarn lint
+          displayName: 'Lint'
+
+  # B) Run unit tests if there is a push or pull request on any branch.
+  - stage: Unit_Tests
+    condition: and(succeeded(), eq('${{parameters.UNIT_TESTS}}', true))
+    dependsOn: []
+    jobs:
+      - job: run_unit_tests
+        steps:
+        - template: templates/node-job-setup/template.yaml@pagopaCommons
+
+        - task: SonarCloudPrepare@3
+          displayName: 'Prepare SonarCloud analysis configuration'
+          inputs:
+            SonarCloud: "SONARCLOUD-SERVICE-CONN"
+            organization: "pagopa"
+            scannerMode: 'CLI'
+            configMode: 'manual'
+            cliProjectKey: 'pagopa_pagopa-search-transactions-fe'
+            cliProjectName: 'pagopa-search-transactions-fe'
+            cliSources: '.'
+            extraProperties: |
+              sonar.javascript.lcov.reportPaths=coverage/lcov.info
+              sonar.clover.reportPath=coverage/clover.xml
+              sonar.testExecutionReportPaths=test-report.xml
+              sonar.sourceEncoding=UTF-8
+              sonar.sources=src/
+              sonar.exclusions=src/**/__tests__/**/*,src/**/__test__/**,**/*.js,src/**/index.ts,src/**/__mocks__/**/*,/src/utils/testing/**
+              sonar.tests=src
+              sonar.test.inclusions=src/**/__tests__/**/*,src/**/__test__/**
+              sonar.cpd.exclusions=src/**/__tests__/**,src/**/__test__/**,__mocks__/**,/src/utils/testing/**
+
+        - script: yarn test:coverage --watchAll=false
+          displayName: 'Unit tests execution'
+
+        - script: yarn lint
+          displayName: 'Lint execution'
+
+        - task: SonarCloudAnalyze@3
+          displayName: 'Sonar Analyze'
+
+        - task: SonarCloudPublish@3
+          displayName: 'Publish result to sonarcloud'
+          inputs:
+            pollingTimeoutSec: '300'
+
+        - task: PublishCodeCoverageResults@2
+          inputs:
+            codeCoverageTool: 'Cobertura'
+            summaryFileLocation: 'coverage/clover.xml'
+            reportDirectory: 'coverage'
+          displayName: 'Publish Code Coverage on Azure Devops'
