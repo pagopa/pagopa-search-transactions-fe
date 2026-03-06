@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+test-report.xml
 
 # next.js
 /.next/
@@ -40,4 +41,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-test-report.xml
+# generated code
+/generated

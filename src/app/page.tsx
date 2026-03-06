@@ -9,10 +9,10 @@ import FullPageLoader from './components/FullPageLoader';
 import FullPageError from './components/FullPageError';
 import PaidNoticeResult from './components/PaidNoticeResult';
 
-import { getPaidNoticeDetail } from './utils/api/client';
 import { validateSearchInput } from './utils/validators';
 import { parseCieFragment, FragmentPayload } from './utils/fragment';
 import { CiePaidNoticeDetail } from './types/CieSearch';
+import { getPaidNoticeDetail } from './utils/api/bizEventSearchTransactionsHelper';
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
