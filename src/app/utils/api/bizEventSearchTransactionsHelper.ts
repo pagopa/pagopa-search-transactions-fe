@@ -5,11 +5,10 @@ import {
   API_KEY,
   createBizEventsSearchTransactionsClient,
 } from "./client";
-import { CiePaidNoticeDetail, CiePaidNoticeRequest } from "../../types/CieSearch";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_CIE_SEARCH_API_BASE_URL ?? "";
 
-const toCiePaidNoticeDetail = (item: CartItem): CiePaidNoticeDetail => ({
+const toCiePaidNoticeDetail = (item: CartItem): CartItem => ({
   subject: item.subject,
   amount: item.amount,
   debtor: item.debtor
@@ -29,8 +28,8 @@ const toCiePaidNoticeDetail = (item: CartItem): CiePaidNoticeDetail => ({
 });
 
 export async function getPaidNoticeDetail(
-  payload: CiePaidNoticeRequest
-): Promise<CiePaidNoticeDetail | null> {
+  payload: { organizationFiscalCode: string; debtorFiscalCode: string; nav: string; token?: string; }
+): Promise<CartItem | null> {
   if (!API_BASE_URL) {
     await new Promise((r) => setTimeout(r, 600));
 

@@ -9,7 +9,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { CiePaidNoticeDetail } from '@/app/types/CieSearch';
+import { CartItem } from '../../../generated/definitions/biz-events-search-transactions-v1/CartItem';
 
 function formatAmount(amount?: string | number) {
   if (amount === undefined || amount === null) return '-';
@@ -24,7 +24,7 @@ export default function PaidNoticeResult({
   detail,
   onBack,
 }: {
-  detail: CiePaidNoticeDetail;
+  detail: CartItem;
   onBack: () => void;
 }) {
   return (

@@ -11,14 +11,14 @@ import PaidNoticeResult from './components/PaidNoticeResult';
 
 import { validateSearchInput } from './utils/validators';
 import { parseCieFragment, FragmentPayload } from './utils/fragment';
-import { CiePaidNoticeDetail } from './types/CieSearch';
 import { getPaidNoticeDetail } from './utils/api/bizEventSearchTransactionsHelper';
+import { CartItem } from '../../generated/definitions/biz-events-search-transactions-v1/CartItem';
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const [payload, setPayload] = useState<FragmentPayload | null>(null);
-  const [result, setResult] = useState<CiePaidNoticeDetail | null>(null);
+  const [result, setResult] = useState<CartItem | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<{ title: string; description?: string } | null>(null);
 
