@@ -2,11 +2,10 @@ import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
 import type { CartItem } from "../../../../generated/definitions/biz-events-search-transactions-v1/CartItem";
 import {
-  API_KEY,
   createBizEventsSearchTransactionsClient,
 } from "./client";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_CIE_SEARCH_API_BASE_URL ?? "";
+const API_BASE_URL = process.env.CIE_SEARCH_API_BASE_URL ?? "";
 
 const toCiePaidNoticeDetail = (item: CartItem): CartItem => ({
   subject: item.subject,
@@ -31,7 +30,7 @@ export async function getPaidNoticeDetail(
   payload: { organizationFiscalCode: string; debtorFiscalCode: string; nav: string; token?: string; }
 ): Promise<CartItem | null> {
   if (!API_BASE_URL) {
-    throw new Error("Missing NEXT_PUBLIC_CIE_SEARCH_API_BASE_URL");
+    throw new Error("Missing CIE_SEARCH_API_BASE_URL");
   }
 
   const client = createBizEventsSearchTransactionsClient(payload.token);
