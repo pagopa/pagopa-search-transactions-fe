@@ -2,7 +2,6 @@ import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
 import type { CartItem } from "../../../../generated/definitions/biz-events-search-transactions-v1/CartItem";
 import {
-  API_KEY,
   createBizEventsSearchTransactionsClient,
 } from "./client";
 

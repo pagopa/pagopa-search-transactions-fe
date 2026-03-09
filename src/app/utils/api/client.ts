@@ -2,7 +2,6 @@ import { createClient } from "../../../../generated/definitions/biz-events-searc
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_CIE_SEARCH_API_BASE_URL ?? "";
 const API_BASE_PATH = process.env.NEXT_PUBLIC_CIE_SEARCH_API_BASE_PATH ?? "";
-export const API_KEY = process.env.NEXT_PUBLIC_CIE_SEARCH_API_KEY ?? "";
 
 export const createBizEventsSearchTransactionsClient = (token?: string) =>
   createClient({

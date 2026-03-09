@@ -10,6 +10,8 @@
     "test:watch": "jest --watch --config=jest.config.ts",
     "test:coverage": "jest --coverage --passWithNoTests --config=jest.config.ts",
     "type-check": "tsc",
+    "lint": "eslint .",
+    "lint-autofix": "eslint . --fix",
     "generate": "npm-run-all generate:*",
     "generate:biz-events-search-transactions-v1": "rimraf generated/definitions/biz-events-search-transactions-v1 && shx mkdir -p generated/definitions/biz-events-search-transactions-v1 && gen-api-models --api-spec https://raw.githubusercontent.com/pagopa/pagopa-infra/ea2121d320af6b9a75c43af61baff3595a2d4897/src/domains/shared-app/api/search-transactions-service/v1/_openapi.json.tpl --no-strict --out-dir ./generated/definitions/biz-events-search-transactions-v1 --request-types --response-decoders --client",
     "prebuild": "npm run generate"
@@ -39,7 +41,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
-    "eslint": "^9",
+    "eslint": "9",
     "eslint-config-next": "16.1.6",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",

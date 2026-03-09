@@ -5,8 +5,6 @@ import { Alert, AlertTitle, Box } from '@mui/material';
 type Props = {
   title: string;
   description?: string;
-  onBack?: () => void;
-  onRetry?: () => void;
 };
 
 export default function FullPageError({ title, description, onBack, onRetry }: Props) {
