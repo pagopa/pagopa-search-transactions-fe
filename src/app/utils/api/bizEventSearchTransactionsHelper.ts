@@ -31,32 +31,7 @@ export async function getPaidNoticeDetail(
   payload: { organizationFiscalCode: string; debtorFiscalCode: string; nav: string; token?: string; }
 ): Promise<CartItem | null> {
   if (!API_BASE_URL) {
-    await new Promise((r) => setTimeout(r, 600));
-
-    const nav = payload.nav.trim();
-
-    if (nav.toUpperCase().endsWith("999")) {
-      throw new Error("Errore mock backend (simulato)");
-    }
-
-    if (/[13579]$/.test(nav.slice(-1))) {
-      return null;
-    }
-
-    return {
-      subject: "CIE - RINNOVO (mock) - Diritti di segreteria",
-      amount: "22.21",
-      payee: {
-        name: "Comune di Esempio",
-        taxCode: payload.organizationFiscalCode,
-      },
-      debtor: {
-        name: "Mario Rossi",
-        taxCode: payload.debtorFiscalCode,
-      },
-      refNumberType: "NAV",
-      refNumberValue: nav,
-    };
+    throw new Error("Missing NEXT_PUBLIC_CIE_SEARCH_API_BASE_URL");
   }
 
   const client = createBizEventsSearchTransactionsClient(payload.token);

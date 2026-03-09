@@ -1,4 +1,4 @@
-import { normalize, isProbablyFiscalCode, isProbablyNav, validateSearchInput } from '../validators';
+import { normalize, matchFiscalCode, matchNav, validateSearchInput } from '../validators';
 
 describe('validators', () => {
   it('normalizes a string by trimming and uppercasing it', () => {
@@ -6,15 +6,15 @@ describe('validators', () => {
   });
 
   it('detects a probable fiscal code', () => {
-    expect(isProbablyFiscalCode('RSSMRA80A01H501U')).toBe(true);
-    expect(isProbablyFiscalCode('12345678901')).toBe(true);
-    expect(isProbablyFiscalCode('abc')).toBe(false);
+    expect(matchFiscalCode('RSSMRA80A01H501U')).toBe(true);
+    expect(matchFiscalCode('12345678901')).toBe(true);
+    expect(matchFiscalCode('abc')).toBe(false);
   });
 
   it('detects a probable NAV', () => {
-    expect(isProbablyNav('302012345678')).toBe(true);
-    expect(isProbablyNav('A1B2C3')).toBe(true);
-    expect(isProbablyNav('12')).toBe(false);
+    expect(matchNav('302012345678')).toBe(true);
+    expect(matchNav('A1B2C3')).toBe(true);
+    expect(matchNav('12')).toBe(false);
   });
 
   it('returns an error message when required fields are missing', () => {

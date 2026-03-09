@@ -14,13 +14,13 @@ export function validateSearchInput(input: {
   if (!input.enteFiscalCode || !input.citizenFiscalCode || !input.nav) {
     return 'Tutti i campi sono obbligatori.';
   }
-  if (!isProbablyFiscalCode(input.enteFiscalCode)) {
+  if (!matchFiscalCode(input.enteFiscalCode)) {
     return 'CF Ente non valido.';
   }
-  if (!isProbablyFiscalCode(input.citizenFiscalCode)) {
+  if (!matchFiscalCode(input.citizenFiscalCode)) {
     return 'CF Cittadino non valido.';
   }
-  if (!isProbablyNav(input.nav)) {
+  if (!matchNav(input.nav)) {
     return 'Numero avviso / NAV non valido.';
   }
   return null;
