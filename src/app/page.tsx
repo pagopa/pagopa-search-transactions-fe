@@ -133,8 +133,6 @@ export default function Home() {
               <FullPageError
                 title={error.title}
                 description={error.description}
-                onBack={() => window.history.back()}
-                onRetry={() => void runCheck()}
               />
             )}
 
@@ -193,7 +191,7 @@ export default function Home() {
                 )}
 
                 {!notFound && result && (
-                  <PaidNoticeResult detail={result} onBack={() => window.history.back()} />
+                  <PaidNoticeResult detail={result} />
                 )}
               </>
             )}

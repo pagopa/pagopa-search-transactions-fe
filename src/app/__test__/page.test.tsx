@@ -2,13 +2,29 @@ import React from 'react';
 import { render, screen, within, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-jest.mock('@pagopa/mui-italia', () => ({
+/*jest.mock('@pagopa/mui-italia', () => ({
   HeaderAccount: () => <div data-testid="HeaderAccount" />,
+  HeaderProduct: () => <div data-testid="HeaderProduct" />,
+}));*/
+
+jest.mock('@pagopa/mui-italia', () => ({
+  HeaderAccount: (props: any) => (
+    <div>
+      <div data-testid="HeaderAccount" />
+      <button onClick={props.onAssistanceClick}>Header assistenza</button>
+      <button onClick={props.onLogin}>Header login</button>
+    </div>
+  ),
   HeaderProduct: () => <div data-testid="HeaderProduct" />,
 }));
 
-const getPaidNoticeDetailMock = jest.fn();
+/*const getPaidNoticeDetailMock = jest.fn();
 jest.mock('../utils/api/client', () => ({
+  getPaidNoticeDetail: (payload: any) => getPaidNoticeDetailMock(payload),
+}));*/
+
+const getPaidNoticeDetailMock = jest.fn();
+jest.mock('../utils/api/bizEventSearchTransactionsHelper', () => ({
   getPaidNoticeDetail: (payload: any) => getPaidNoticeDetailMock(payload),
 }));
 
@@ -26,10 +42,9 @@ jest.mock('../components/FullPageError', () => (props: any) => (
   <div role="alert">
     <div>{props.title}</div>
     {props.description && <div>{props.description}</div>}
-    <button onClick={props.onBack}>Indietro</button>
-    <button onClick={props.onRetry}>Riprova</button>
   </div>
 ));
+
 
 import Home from '../page';
 
@@ -218,27 +233,6 @@ describe('Home page', () => {
     );
   });
 
-  it('retry re-runs check and clears previous error', async () => {
-    // 1a run: fragment ok, validation error
-    parseCieFragmentMock.mockReturnValue({
-      enteFiscalCode: 'xxx',
-      citizenFiscalCode: 'yyy',
-      nav: 'zzz',
-    });
-    validateSearchInputMock.mockReturnValueOnce('CF Ente non valido.');
-
-    render(<Home />);
-    expect(await screen.findByText('Parametri non validi')).toBeInTheDocument();
-
-    // 2a run: validation ok + api null => not found
-    validateSearchInputMock.mockReturnValueOnce(null);
-    getPaidNoticeDetailMock.mockResolvedValueOnce(null);
-
-    fireEvent.click(screen.getByRole('button', { name: /riprova/i }));
-
-    expect(await screen.findByText(/Pagamento non trovato/i)).toBeInTheDocument();
-  });
-
   it('does not run twice on rerender (didRun guard)', async () => {
     parseCieFragmentMock.mockReturnValue({
       enteFiscalCode: '12345678901',
@@ -254,4 +248,19 @@ describe('Home page', () => {
     rerender(<Home />);
     expect(getPaidNoticeDetailMock).toHaveBeenCalledTimes(1);
   });  
+
+  it('wires header callbacks', () => {
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    parseCieFragmentMock.mockReturnValue(null);
+    render(<Home />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Header assistenza' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Header login' }));
+
+    expect(logSpy).toHaveBeenCalledWith('Assistenza');
+    expect(logSpy).toHaveBeenCalledWith('Login');
+
+    logSpy.mockRestore();
+  });
 });

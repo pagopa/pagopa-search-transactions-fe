@@ -7,7 +7,7 @@ type Props = {
   description?: string;
 };
 
-export default function FullPageError({ title, description, onBack, onRetry }: Props) {
+export default function FullPageError({ title, description }: Props) {
   return (
     <Box minHeight={280} display="flex" justifyContent="center" alignItems="center">
       <Box width="100%" maxWidth={720}>
