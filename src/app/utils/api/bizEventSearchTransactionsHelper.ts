@@ -59,11 +59,6 @@ export async function getPaidNoticeDetail(
     };
   }
 
-  
-  /*if (!API_KEY) {
-    throw new Error("NEXT_PUBLIC_CIE_SEARCH_API_KEY non configurata");
-  }*/
-
   const client = createBizEventsSearchTransactionsClient(payload.token);
 
   const result = await client.getPaidNoticeDetail({
