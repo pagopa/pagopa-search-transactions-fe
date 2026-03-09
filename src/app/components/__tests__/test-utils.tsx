@@ -1,3 +1,5 @@
+/* eslint-disable react/display-name */
+/* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 

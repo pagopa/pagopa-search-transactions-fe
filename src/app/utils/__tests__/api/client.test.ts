@@ -31,6 +31,7 @@ async function loadClientModule(baseUrl?: string, basePath?: string) {
 describe('createBizEventsSearchTransactionsClient', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (global as any).fetch = fetchMock;
     fetchMock.mockResolvedValue({ ok: true });
   });

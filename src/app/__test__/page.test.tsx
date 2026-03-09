@@ -2,12 +2,9 @@ import React from 'react';
 import { render, screen, within, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-/*jest.mock('@pagopa/mui-italia', () => ({
-  HeaderAccount: () => <div data-testid="HeaderAccount" />,
-  HeaderProduct: () => <div data-testid="HeaderProduct" />,
-}));*/
 
 jest.mock('@pagopa/mui-italia', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   HeaderAccount: (props: any) => (
     <div>
       <div data-testid="HeaderAccount" />
@@ -18,14 +15,9 @@ jest.mock('@pagopa/mui-italia', () => ({
   HeaderProduct: () => <div data-testid="HeaderProduct" />,
 }));
 
-/*const getPaidNoticeDetailMock = jest.fn();
-jest.mock('../utils/api/client', () => ({
-  getPaidNoticeDetail: (payload: any) => getPaidNoticeDetailMock(payload),
-}));*/
-
 const getPaidNoticeDetailMock = jest.fn();
 jest.mock('../utils/api/bizEventSearchTransactionsHelper', () => ({
-  getPaidNoticeDetail: (payload: any) => getPaidNoticeDetailMock(payload),
+  getPaidNoticeDetail: (payload: { organizationFiscalCode: string; debtorFiscalCode: string; nav: string; token?: string; }) => getPaidNoticeDetailMock(payload),
 }));
 
 const parseCieFragmentMock = jest.fn();
@@ -35,15 +27,25 @@ jest.mock('../utils/fragment', () => ({
 
 const validateSearchInputMock = jest.fn();
 jest.mock('../utils/validators', () => ({
-  validateSearchInput: (input: any) => validateSearchInputMock(input),
+  validateSearchInput: (input: {
+  enteFiscalCode: string;
+  citizenFiscalCode: string;
+  nav: string;
+}) => validateSearchInputMock(input),
 }));
 
-jest.mock('../components/FullPageError', () => (props: any) => (
-  <div role="alert">
-    <div>{props.title}</div>
-    {props.description && <div>{props.description}</div>}
-  </div>
-));
+jest.mock('../components/FullPageError', () => {
+  function MockFullPageError(props: { title: string; description?: string }) {
+    return (
+      <div role="alert">
+        <div>{props.title}</div>
+        {props.description && <div>{props.description}</div>}
+      </div>
+    );
+  }
+
+  return MockFullPageError;
+});
 
 
 import Home from '../page';
