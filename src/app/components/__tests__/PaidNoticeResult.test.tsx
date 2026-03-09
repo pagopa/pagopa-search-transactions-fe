@@ -17,7 +17,7 @@ describe('PaidNoticeResult', () => {
   };
 
   it('renders the success summary and paid status', () => {
-    renderWithProviders(<PaidNoticeResult detail={baseDetail} onBack={jest.fn()} />);
+    renderWithProviders(<PaidNoticeResult detail={baseDetail} />);
 
     expect(screen.getByText('Esito verifica pagamento')).toBeInTheDocument();
     expect(screen.getByRole('alert')).toHaveTextContent('Pagamento trovato.');
@@ -26,7 +26,7 @@ describe('PaidNoticeResult', () => {
 
   it('formats the amount as EUR using Italian locale', () => {
     renderWithProviders(
-      <PaidNoticeResult detail={{ ...baseDetail, amount: '10,5' }} onBack={jest.fn()} />
+      <PaidNoticeResult detail={{ ...baseDetail, amount: '10,5' }} />
     );
 
     // it-IT currency output is typically like "10,50 €" (with a space that can be NBSP)
@@ -43,7 +43,7 @@ describe('PaidNoticeResult', () => {
         refNumberValue: undefined,
     };
 
-    renderWithProviders(<PaidNoticeResult detail={detail} onBack={jest.fn()} />);
+    renderWithProviders(<PaidNoticeResult detail={detail} />);
 
     // Amount fallback: scope to the "Importo" field container
     const importoLabel = screen.getByText('Importo');
@@ -62,9 +62,12 @@ describe('PaidNoticeResult', () => {
     expect(screen.getByText('EEEEFFFFGGGGHHHH')).toBeInTheDocument();
     });
 
-  it('does not call onBack just by rendering', () => {
-    const onBack = jest.fn();
-    renderWithProviders(<PaidNoticeResult detail={baseDetail} onBack={onBack} />);
-    expect(onBack).not.toHaveBeenCalled();
+
+  it('renders raw amount when it is not numeric', () => {
+    renderWithProviders(
+      <PaidNoticeResult detail={{ ...baseDetail, amount: 'not-a-number' }} />
+    );
+
+    expect(screen.getByText('not-a-number')).toBeInTheDocument();
   });
 });

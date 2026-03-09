@@ -22,10 +22,8 @@ function formatAmount(amount?: string | number) {
 
 export default function PaidNoticeResult({
   detail,
-  onBack,
 }: {
   detail: CartItem;
-  onBack: () => void;
 }) {
   return (
     <Box>

@@ -5,6 +5,12 @@ const config: Config = {
   testEnvironment: 'jsdom',
   clearMocks: true,
   collectCoverage: true,
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx}',
+    '!src/**/*.test.{ts,tsx}',
+    '!src/**/__test__/**',
+    '!src/**/__tests__/**',
+  ],
   coverageDirectory: 'coverage',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',

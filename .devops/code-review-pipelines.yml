@@ -87,7 +87,9 @@ stages:
               sonar.test.inclusions=src/**/__tests__/**/*,src/**/__test__/**
               sonar.cpd.exclusions=src/**/__tests__/**,src/**/__test__/**,__mocks__/**,/src/utils/testing/**
 
-        - script: yarn test:coverage --watchAll=false
+        - script: |
+            yarn generate
+            yarn test:coverage --watchAll=false
           displayName: 'Unit tests execution'
 
         - script: yarn lint
