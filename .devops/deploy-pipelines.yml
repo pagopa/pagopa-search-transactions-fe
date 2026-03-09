@@ -67,7 +67,7 @@ stages:
               DOCKER_IMAGE_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
               DOCKER_IMAGE_TAG: $(Build.SourceVersion)
               FORCE_REPLACE_DOCKER_IMAGE: ${{ parameters.FORCE_REPLACE_DOCKER_IMAGE }}
-              DOCKER_BUILD_ARGS: --build-arg CIE_SEARCH_API_BASE_URL=$(search_transactions_service_api_host) --build-arg CIE_SEARCH_API_BASE_PATH=$(search_transactions_base_path) --build-arg
+              DOCKER_BUILD_ARGS: --build-arg CIE_SEARCH_API_BASE_URL=$(search_transactions_service_api_host) --build-arg CIE_SEARCH_API_BASE_PATH=$(search_transactions_base_path)
 
   - stage: 'Deploy_for_DEV'
     displayName: 'Deploy DEV'
