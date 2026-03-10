@@ -1,7 +1,7 @@
 import { createClient } from "../../../../generated/definitions/biz-events-search-transactions-v1/client";
 
-const API_BASE_URL = process.env.CIE_SEARCH_API_BASE_URL ?? "";
-const API_BASE_PATH = process.env.CIE_SEARCH_API_BASE_PATH ?? "";
+const API_BASE_URL = process.env.NEXT_PUBLIC_CIE_SEARCH_API_BASE_URL ?? "";
+const API_BASE_PATH = process.env.NEXT_PUBLIC_CIE_SEARCH_API_BASE_PATH ?? "";
 
 export const createBizEventsSearchTransactionsClient = (token?: string) =>
   createClient({
