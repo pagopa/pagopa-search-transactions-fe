@@ -38,8 +38,6 @@ function safeDecode(v: string) {
 }
 
 export function parseCieFragment(hash: string): FragmentPayload | null {
-      console.log("starting parseCieFragment");
-
   if (!hash || hash === '#') return null;
 
   const raw = hash.startsWith('#') ? hash.slice(1) : hash;
@@ -57,7 +55,7 @@ export function parseCieFragment(hash: string): FragmentPayload | null {
     const nav = pick(params, aliases.nav);
 
     if (!enteFiscalCode || !citizenFiscalCode || !nav) return null;
-      console.log("end parseCieFragment");
+
     return {
       enteFiscalCode,
       citizenFiscalCode,
