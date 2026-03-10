@@ -12,7 +12,7 @@ export const createBizEventsSearchTransactionsClient = (token?: string) =>
 
 
       if (token) {
-        headers.set("token", token);
+        headers.set("Authorization ", "Bearer " + token);
       }
 
       return fetch(input, {

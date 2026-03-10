@@ -53,14 +53,15 @@ export function parseCieFragment(hash: string): FragmentPayload | null {
     const enteFiscalCode = pick(params, aliases.enteFiscalCode);
     const citizenFiscalCode = pick(params, aliases.citizenFiscalCode);
     const nav = pick(params, aliases.nav);
+    const token = pick(params, aliases.token);
 
-    if (!enteFiscalCode || !citizenFiscalCode || !nav) return null;
+    if (!enteFiscalCode || !citizenFiscalCode || !nav || !token) return null;
 
     return {
       enteFiscalCode,
       citizenFiscalCode,
       nav,
-      token: pick(params, aliases.token),
+      token,
       requestType: pick(params, aliases.requestType),
     };
   }
