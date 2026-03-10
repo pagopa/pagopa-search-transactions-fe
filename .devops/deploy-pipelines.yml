@@ -54,7 +54,8 @@ stages:
     displayName: 'Build for DEV'
     condition: and(succeeded(), not(${{ parameters.SKIP_BUILD }}), eq(${{parameters.DEV_DEPLOY}}, true))
     variables:
-      # to be defined
+      search_transactions_service_api_host: 'https://api.dev.platform.pagopa.it'
+      search_transactions_base_path: '/searchtransactions/v1'
     jobs:
       - job: Build_docker
         displayName: Build docker with Build.SourceVersion as TAG
@@ -66,7 +67,7 @@ stages:
               DOCKER_IMAGE_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
               DOCKER_IMAGE_TAG: $(Build.SourceVersion)
               FORCE_REPLACE_DOCKER_IMAGE: ${{ parameters.FORCE_REPLACE_DOCKER_IMAGE }}
-              DOCKER_BUILD_ARGS: --build-arg #set vars
+              DOCKER_BUILD_ARGS: --build-arg CIE_SEARCH_API_BASE_URL=$(search_transactions_service_api_host) --build-arg CIE_SEARCH_API_BASE_PATH=$(search_transactions_base_path)
 
   - stage: 'Deploy_for_DEV'
     displayName: 'Deploy DEV'
@@ -114,7 +115,10 @@ stages:
           eq(variables['Build.SourceBranch'], 'refs/heads/main'),
           startsWith(variables['Build.SourceBranch'], 'refs/tags')
         )
-    )
+      )
+    variables:
+      search_transactions_service_api_host: 'https://api.uat.platform.pagopa.it'
+      search_transactions_base_path: '/searchtransactions/v1'
     jobs:
       - job: "build"
         displayName: 'Build release candidate docker image'
@@ -126,6 +130,8 @@ stages:
               DOCKER_IMAGE_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
               DOCKER_IMAGE_TAG: $(Build.SourceVersion)
               FORCE_REPLACE_DOCKER_IMAGE: ${{ parameters.FORCE_REPLACE_DOCKER_IMAGE }}
+              DOCKER_BUILD_ARGS: --build-arg CIE_SEARCH_API_BASE_URL=$(search_transactions_service_api_host) --build-arg CIE_SEARCH_API_BASE_PATH=$(search_transactions_base_path) --build-arg
+
           - template: azure-templates/chart-current-version.yml
 
   - stage: "Get_Release_Version"
@@ -243,12 +249,15 @@ stages:
     dependsOn: [Prod_WaitForApproval,Get_Release_Version]
     variables:
       prod_version: $[ stageDependencies.Get_Release_Version.get_version.outputs['chart_current_version.appVersion'] ]
+      search_transactions_service_api_host: 'https://api.platform.pagopa.it'
+      search_transactions_base_path: '/searchtransactions/v1'
     condition: |
       and(
         eq(${{parameters.UAT_PROD_DEPLOY}}, true),
         eq(dependencies.Prod_WaitForApproval.result, 'Succeeded'),
         eq(dependencies.Get_Release_Version.result, 'Succeeded')
       )
+  
     jobs:
       - job: "build"
         displayName: 'Build release candidate docker image'
@@ -260,6 +269,8 @@ stages:
               DOCKER_IMAGE_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
               DOCKER_IMAGE_TAG: $(prod_version)
               FORCE_REPLACE_DOCKER_IMAGE: ${{ parameters.FORCE_REPLACE_DOCKER_IMAGE }}
+              DOCKER_BUILD_ARGS: --build-arg CIE_SEARCH_API_BASE_URL=$(search_transactions_service_api_host) --build-arg CIE_SEARCH_API_BASE_PATH=$(search_transactions_base_path)
+
           - template: azure-templates/chart-current-version.yml
 
   - stage: "Deploy_PROD_Green"
