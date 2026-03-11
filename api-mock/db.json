@@ -3,22 +3,87 @@
     {
       "id": 1,
       "organizationFiscalCode": "00493410583",
-      "debtorFiscalCode": "44445554444",
+      "debtorFiscalCode": "RSSMRA80A01H501U",
       "nav": "39912121212121212",
       "status": 200,
       "body": {
         "subject": "Pagamento BPAY",
         "amount": "2681.52",
         "payee": {
-          "name": "testVCompanyName007",
+          "name": "Comune di Roma",
           "taxCode": "00493410583"
         },
         "debtor": {
-          "name": "CICCIO DEBTOR",
-          "taxCode": "44445554444"
+          "name": "Mario Rossi",
+          "taxCode": "RSSMRA80A01H501U"
         },
         "refNumberValue": "39912121212121212",
         "refNumberType": "codiceAvviso"
+      }
+    },
+    {
+      "id": 2,
+      "organizationFiscalCode": "00493410583",
+      "debtorFiscalCode": "RSSMRA80A01H501U",
+      "nav": "40012121212121212",
+      "status": 400,
+      "body": {
+        "title": "Bad Request",
+        "status": 400,
+        "detail": "Invalid CF (Tax Code)",
+        "code": "GN_400_003"
+      }
+    },
+    {
+      "id": 3,
+      "organizationFiscalCode": "00493410583",
+      "debtorFiscalCode": "RSSMRA80A01H501U",
+      "nav": "40112121212121212",
+      "status": 401
+    },
+    {
+      "id": 4,
+      "organizationFiscalCode": "00493410583",
+      "debtorFiscalCode": "RSSMRA80A01H501U",
+      "nav": "40312121212121212",
+      "status": 403,
+      "body": {
+        "title": "Forbidden",
+        "status": 403,
+        "detail": "Invalid NAV matching"
+      }
+    },
+    {
+      "id": 5,
+      "organizationFiscalCode": "00493410583",
+      "debtorFiscalCode": "RSSMRA80A01H501U",
+      "nav": "40412121212121212",
+      "status": 404,
+      "body": {
+        "title": "Not Found",
+        "status": 404,
+        "detail": "Biz Event not found with CF and IUV",
+        "code": "BZ_404_004"
+      }
+    },
+    {
+      "id": 6,
+      "organizationFiscalCode": "00493410583",
+      "debtorFiscalCode": "RSSMRA80A01H501U",
+      "nav": "42912121212121212",
+      "status": 429
+    },
+    {
+      "id": 7,
+      "organizationFiscalCode": "00493410583",
+      "debtorFiscalCode": "RSSMRA80A01H501U",
+      "nav": "50012121212121212",
+      "status": 500,
+      "body": {
+        "title": "Internal Server Error",
+        "status": 500,
+        "detail": "Unexpected error",
+        "code": "UN_500_000"
       }
     }
   ]

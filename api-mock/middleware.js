@@ -4,6 +4,8 @@ const { randomUUID } = require('crypto');
 const REAL_ENDPOINT =
   /^\/searchtransactions\/v1\/transactions\/organizations\/([^/]+)\/notices\/([^/]+)$/;
 
+const VALID_TOKEN = 'mock-valid-token';
+
 function problem(status, title, detail, code) {
   return {
     status,
@@ -18,10 +20,6 @@ module.exports = function (req, res, next) {
   res.setHeader('X-Request-Id', requestId);
   res.setHeader('Access-Control-Expose-Headers', 'X-Request-Id');
 
-  console.log('[mock] URL:', req.originalUrl);
-  console.log('[mock] Method:', req.method);
-  console.log('[mock] x-fiscal-code:', req.get('x-fiscal-code'));
-
   if (req.method !== 'GET') {
     return next();
   }
@@ -34,6 +32,7 @@ module.exports = function (req, res, next) {
   const organizationFiscalCode = decodeURIComponent(match[1]);
   const nav = decodeURIComponent(match[2]);
   const debtorFiscalCode = req.get('x-fiscal-code');
+  const token = req.get('token');
 
   if (!debtorFiscalCode) {
     return res.status(400).jsonp(
@@ -41,9 +40,14 @@ module.exports = function (req, res, next) {
         400,
         'Bad Request',
         'Missing required header x-fiscal-code',
-        'MISSING_X_FISCAL_CODE'
+        'GN_400_001'
       )
     );
+  }
+
+  if (token !== VALID_TOKEN) {
+    res.status(401);
+    return res.end();
   }
 
   const query = new URLSearchParams({
@@ -70,8 +74,8 @@ module.exports = function (req, res, next) {
         problem(
           404,
           'Not Found',
-          `Paid notice not found for organizationFiscalCode=${organizationFiscalCode}, debtorFiscalCode=${debtorFiscalCode}, nav=${nav}`,
-          'PAID_NOTICE_NOT_FOUND'
+          'Biz Event not found with CF and IUV',
+          'BZ_404_004'
         )
       );
     }
@@ -83,14 +87,13 @@ module.exports = function (req, res, next) {
       return originalJsonp(item.body);
     }
 
+    if (status === 429) {
+      return res.end();
+    }
+
     return originalJsonp(
       item.body ||
-        problem(
-          status,
-          'Mock error',
-          `Mocked response with status ${status}`,
-          'MOCK_ERROR'
-        )
+        problem(status, 'Mock error', `Mocked response with status ${status}`, 'TS_000_000')
     );
   };
 

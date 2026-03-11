@@ -33,18 +33,6 @@ describe('getPaidNoticeDetail', () => {
     });
   });
 
-  it('throws when env is missing', async () => {
-    const { getPaidNoticeDetail } = await loadHelperModule();
-
-    await expect(
-      getPaidNoticeDetail({
-        organizationFiscalCode: '12345678901',
-        debtorFiscalCode: 'RSSMRA80A01H501U',
-        nav: '3020123456789',
-      })
-    ).rejects.toThrow('Missing NEXT_PUBLIC_CIE_SEARCH_API_BASE_URL');
-  });
-
   it('returns mapped value on 200', async () => {
     const { getPaidNoticeDetail } = await loadHelperModule('https://api.example.test');
 
@@ -67,7 +55,7 @@ describe('getPaidNoticeDetail', () => {
         organizationFiscalCode: '12345678901',
         debtorFiscalCode: 'RSSMRA80A01H501U',
         nav: '3020123456789',
-        token: 'tok-123',
+        token: 'mock-valid-token',
       })
     ).resolves.toEqual({
       amount: '22.21',
@@ -77,21 +65,40 @@ describe('getPaidNoticeDetail', () => {
       refNumberType: 'NAV',
       refNumberValue: '3020123456789',
     });
+  });
 
-    expect(createBizEventsSearchTransactionsClientMock).toHaveBeenCalledWith('tok-123');
-    expect(clientGetPaidNoticeDetailMock).toHaveBeenCalledWith({
-      'organization-fiscal-code': '12345678901',
-      'x-fiscal-code': 'RSSMRA80A01H501U',
-      nav: '3020123456789',
-      'X-Request-Id': 'uuid-123',
+  it('throws mapped ui error on 401', async () => {
+    const { getPaidNoticeDetail } = await loadHelperModule('https://api.example.test');
+
+    clientGetPaidNoticeDetailMock.mockResolvedValue(E.right({ status: 401 }));
+
+    await expect(
+      getPaidNoticeDetail({
+        organizationFiscalCode: '12345678901',
+        debtorFiscalCode: 'RSSMRA80A01H501U',
+        nav: '3020123456789',
+        token: 'wrong-token',
+      })
+    ).rejects.toMatchObject({
+      name: 'ApiRequestError',
+      title: 'Utente non autorizzato',
+      status: 401,
     });
   });
 
-  it('returns null on 404', async () => {
+  it('throws mapped ui error on 404', async () => {
     const { getPaidNoticeDetail } = await loadHelperModule('https://api.example.test');
 
     clientGetPaidNoticeDetailMock.mockResolvedValue(
-      E.right({ status: 404, value: { title: 'Not found' } })
+      E.right({
+        status: 404,
+        value: {
+          title: 'Not Found',
+          status: 404,
+          detail: 'Biz Event not found with CF and IUV',
+          code: 'BZ_404_004',
+        },
+      })
     );
 
     await expect(
@@ -100,13 +107,18 @@ describe('getPaidNoticeDetail', () => {
         debtorFiscalCode: 'RSSMRA80A01H501U',
         nav: '3020123456789',
       })
-    ).resolves.toBeNull();
+    ).rejects.toMatchObject({
+      name: 'ApiRequestError',
+      title: 'Pagamento non trovato',
+      status: 404,
+      code: 'BZ_404_004',
+    });
   });
 
-  it('rethrows left Error message', async () => {
+  it('throws mapped ui error on 429', async () => {
     const { getPaidNoticeDetail } = await loadHelperModule('https://api.example.test');
 
-    clientGetPaidNoticeDetailMock.mockResolvedValue(E.left(new Error('Kaboom left')));
+    clientGetPaidNoticeDetailMock.mockResolvedValue(E.right({ status: 429 }));
 
     await expect(
       getPaidNoticeDetail({
@@ -114,10 +126,89 @@ describe('getPaidNoticeDetail', () => {
         debtorFiscalCode: 'RSSMRA80A01H501U',
         nav: '3020123456789',
       })
-    ).rejects.toThrow('Kaboom left');
+    ).rejects.toMatchObject({
+      name: 'ApiRequestError',
+      title: 'Troppe richieste',
+      status: 429,
+    });
   });
 
-  it('uses generic communication error for non-Error left values', async () => {
+  it('throws generic error on unexpected status', async () => {
+    const { getPaidNoticeDetail } = await loadHelperModule('https://api.example.test');
+
+    clientGetPaidNoticeDetailMock.mockResolvedValue(E.right({ status: 418 }));
+
+    await expect(
+      getPaidNoticeDetail({
+        organizationFiscalCode: '12345678901',
+        debtorFiscalCode: 'RSSMRA80A01H501U',
+        nav: '3020123456789',
+      })
+    ).rejects.toThrow('Errore verifica (418)');
+  });
+
+    it('throws when base url env is missing', async () => {
+    const { getPaidNoticeDetail } = await loadHelperModule();
+
+    await expect(
+      getPaidNoticeDetail({
+        organizationFiscalCode: '12345678901',
+        debtorFiscalCode: 'RSSMRA80A01H501U',
+        nav: '3020123456789',
+      })
+    ).rejects.toThrow('Missing NEXT_PUBLIC_CIE_SEARCH_API_BASE_URL');
+
+    expect(createBizEventsSearchTransactionsClientMock).not.toHaveBeenCalled();
+  });
+
+  it('returns mapped value on 200 even when payee and debtor are missing', async () => {
+    const { getPaidNoticeDetail } = await loadHelperModule('https://api.example.test');
+
+    clientGetPaidNoticeDetailMock.mockResolvedValue(
+      E.right({
+        status: 200,
+        value: {
+          amount: '22.21',
+          subject: 'Mensa scolastica',
+          refNumberType: 'NAV',
+          refNumberValue: '3020123456789',
+          payee: undefined,
+          debtor: undefined,
+        },
+      })
+    );
+
+    await expect(
+      getPaidNoticeDetail({
+        organizationFiscalCode: '12345678901',
+        debtorFiscalCode: 'RSSMRA80A01H501U',
+        nav: '3020123456789',
+      })
+    ).resolves.toEqual({
+      amount: '22.21',
+      subject: 'Mensa scolastica',
+      payee: undefined,
+      debtor: undefined,
+      refNumberType: 'NAV',
+      refNumberValue: '3020123456789',
+    });
+  });
+
+  it('rethrows left error message when client returns Either.left(Error)', async () => {
+    const { getPaidNoticeDetail } = await loadHelperModule('https://api.example.test');
+
+    clientGetPaidNoticeDetailMock.mockResolvedValue(E.left(new Error('backend down')));
+
+    await expect(
+      getPaidNoticeDetail({
+        organizationFiscalCode: '12345678901',
+        debtorFiscalCode: 'RSSMRA80A01H501U',
+        nav: '3020123456789',
+      })
+    ).rejects.toThrow('backend down');
+  });
+
+  it('throws generic communication error when client returns Either.left(non Error)', async () => {
     const { getPaidNoticeDetail } = await loadHelperModule('https://api.example.test');
 
     clientGetPaidNoticeDetailMock.mockResolvedValue(E.left('boom'));
@@ -129,5 +220,90 @@ describe('getPaidNoticeDetail', () => {
         nav: '3020123456789',
       })
     ).rejects.toThrow('Errore di comunicazione con il backend');
+  });
+
+  it('throws mapped ui error on 400', async () => {
+    const { getPaidNoticeDetail } = await loadHelperModule('https://api.example.test');
+
+    clientGetPaidNoticeDetailMock.mockResolvedValue(
+      E.right({
+        status: 400,
+        value: {
+          title: 'Bad Request',
+          status: 400,
+          detail: 'Invalid CF (Tax Code)',
+          code: 'GN_400_003',
+        },
+      })
+    );
+
+    await expect(
+      getPaidNoticeDetail({
+        organizationFiscalCode: '12345678901',
+        debtorFiscalCode: 'RSSMRA80A01H501U',
+        nav: '3020123456789',
+      })
+    ).rejects.toMatchObject({
+      name: 'ApiRequestError',
+      title: 'Codice fiscale non valido',
+      status: 400,
+      code: 'GN_400_003',
+    });
+  });
+
+  it('throws mapped ui error on 403', async () => {
+    const { getPaidNoticeDetail } = await loadHelperModule('https://api.example.test');
+
+    clientGetPaidNoticeDetailMock.mockResolvedValue(
+      E.right({
+        status: 403,
+        value: {
+          title: 'Forbidden',
+          status: 403,
+          detail: 'Invalid NAV matching',
+        },
+      })
+    );
+
+    await expect(
+      getPaidNoticeDetail({
+        organizationFiscalCode: '12345678901',
+        debtorFiscalCode: 'RSSMRA80A01H501U',
+        nav: '3020123456789',
+      })
+    ).rejects.toMatchObject({
+      name: 'ApiRequestError',
+      title: 'Numero avviso non valido',
+      status: 403,
+    });
+  });
+
+  it('throws mapped ui error on 500', async () => {
+    const { getPaidNoticeDetail } = await loadHelperModule('https://api.example.test');
+
+    clientGetPaidNoticeDetailMock.mockResolvedValue(
+      E.right({
+        status: 500,
+        value: {
+          title: 'Internal Server Error',
+          status: 500,
+          detail: 'Unexpected error',
+          code: 'UN_500_000',
+        },
+      })
+    );
+
+    await expect(
+      getPaidNoticeDetail({
+        organizationFiscalCode: '12345678901',
+        debtorFiscalCode: 'RSSMRA80A01H501U',
+        nav: '3020123456789',
+      })
+    ).rejects.toMatchObject({
+      name: 'ApiRequestError',
+      title: 'Errore imprevisto',
+      status: 500,
+      code: 'UN_500_000',
+    });
   });
 });

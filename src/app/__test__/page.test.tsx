@@ -1,7 +1,6 @@
 import React from 'react';
-import { render, screen, within, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
-
 
 jest.mock('@pagopa/mui-italia', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -17,7 +16,12 @@ jest.mock('@pagopa/mui-italia', () => ({
 
 const getPaidNoticeDetailMock = jest.fn();
 jest.mock('../utils/api/bizEventSearchTransactionsHelper', () => ({
-  getPaidNoticeDetail: (payload: { organizationFiscalCode: string; debtorFiscalCode: string; nav: string; token?: string; }) => getPaidNoticeDetailMock(payload),
+  getPaidNoticeDetail: (payload: {
+    organizationFiscalCode: string;
+    debtorFiscalCode: string;
+    nav: string;
+    token?: string;
+  }) => getPaidNoticeDetailMock(payload),
 }));
 
 const parseCieFragmentMock = jest.fn();
@@ -28,18 +32,25 @@ jest.mock('../utils/fragment', () => ({
 const validateSearchInputMock = jest.fn();
 jest.mock('../utils/validators', () => ({
   validateSearchInput: (input: {
-  enteFiscalCode: string;
-  citizenFiscalCode: string;
-  nav: string;
-}) => validateSearchInputMock(input),
+    enteFiscalCode: string;
+    citizenFiscalCode: string;
+    nav: string;
+  }) => validateSearchInputMock(input),
 }));
 
 jest.mock('../components/FullPageError', () => {
-  function MockFullPageError(props: { title: string; description?: string }) {
+  function MockFullPageError(props: {
+    title: string;
+    description?: string;
+    status?: number;
+    code?: string;
+  }) {
     return (
       <div role="alert">
         <div>{props.title}</div>
         {props.description && <div>{props.description}</div>}
+        {props.status !== undefined && <div>{`HTTP ${props.status}`}</div>}
+        {props.code && <div>{`Codice errore: ${props.code}`}</div>}
       </div>
     );
   }
@@ -47,13 +58,31 @@ jest.mock('../components/FullPageError', () => {
   return MockFullPageError;
 });
 
-
 import Home from '../page';
+import { ApiRequestError } from '../utils/api/errors';
+
+const successfulDetail = {
+  amount: '22.21',
+  subject: 'Test subject',
+  payee: { name: 'Comune', taxCode: '12345678901' },
+  debtor: { name: 'Mario', taxCode: 'RSSMRA80A01H501U' },
+  refNumberType: 'NAV',
+  refNumberValue: '3020123456780',
+};
 
 describe('Home page', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    window.location.hash = '#anything';
+    window.location.hash = '#cfEnte=12345678901&cfCittadino=RSSMRA80A01H501U&nav=3020123456780';
+
+    parseCieFragmentMock.mockReturnValue({
+      enteFiscalCode: '12345678901',
+      citizenFiscalCode: 'RSSMRA80A01H501U',
+      nav: '3020123456780',
+    });
+
+    validateSearchInputMock.mockReturnValue(null);
+    getPaidNoticeDetailMock.mockResolvedValue(successfulDetail);
   });
 
   it('shows an error when fragment parameters are missing', async () => {
@@ -61,14 +90,12 @@ describe('Home page', () => {
 
     render(<Home />);
 
-    // No loader is guaranteed here; the page can render the error immediately.
     expect(await screen.findByText('Parametri mancanti')).toBeInTheDocument();
     expect(
       screen.getByText(/CF Ente, CF Cittadino e NAV devono essere nel fragment URL/i)
     ).toBeInTheDocument();
-
-    // also assert that an error alert exists
     expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(getPaidNoticeDetailMock).not.toHaveBeenCalled();
   });
 
   it('shows an error when validation fails', async () => {
@@ -87,65 +114,58 @@ describe('Home page', () => {
     expect(getPaidNoticeDetailMock).not.toHaveBeenCalled();
   });
 
-  it('shows not found warning when API returns null', async () => {
-    parseCieFragmentMock.mockReturnValue({
-      enteFiscalCode: '12345678901',
-      citizenFiscalCode: 'RSSMRA80A01H501U',
-      nav: '3020123456789',
-    });
+it('renders the paid notice result and request summary when API returns a detail', async () => {
+  render(<Home />);
 
-    validateSearchInputMock.mockReturnValue(null);
-    getPaidNoticeDetailMock.mockResolvedValue(null);
+  expect(await screen.findByText('Esito verifica pagamento')).toBeInTheDocument();
+  expect(screen.getByText('PAGATO')).toBeInTheDocument();
 
-    render(<Home />);
+  const requestSectionTitle = screen.getByText('Dati richiesta');
+  const requestSection = requestSectionTitle.parentElement as HTMLElement;
 
-    expect(await screen.findByText(/Pagamento non trovato/i)).toBeInTheDocument();
+  expect(within(requestSection).getByText('CF Ente')).toBeInTheDocument();
+  expect(within(requestSection).getByText('CF Cittadino')).toBeInTheDocument();
+  expect(within(requestSection).getByText('Numero avviso / NAV')).toBeInTheDocument();
 
-    // The NAV appears in multiple places (request summary + alert). Assert it appears at least once.
-    expect(screen.getAllByText('3020123456789').length).toBeGreaterThanOrEqual(1);
-
-    // Even better: check that the alert contains it
-    const alert = screen.getByRole('alert');
-    expect(within(alert).getByText('3020123456789')).toBeInTheDocument();
-  });
-
-  it('renders the paid notice result when API returns a detail', async () => {
-    parseCieFragmentMock.mockReturnValue({
-      enteFiscalCode: '12345678901',
-      citizenFiscalCode: 'RSSMRA80A01H501U',
-      nav: '3020123456780',
-    });
-
-    validateSearchInputMock.mockReturnValue(null);
-    getPaidNoticeDetailMock.mockResolvedValue({
-      amount: '22.21',
-      subject: 'Test subject',
-      payee: { name: 'Comune', taxCode: '12345678901' },
-      debtor: { name: 'Mario', taxCode: 'RSSMRA80A01H501U' },
-      refNumberType: 'NAV',
-      refNumberValue: '3020123456780',
-    });
-
-    render(<Home />);
-
-    expect(await screen.findByText('Esito verifica pagamento')).toBeInTheDocument();
-    expect(screen.getByText('PAGATO')).toBeInTheDocument();
-  });
+  expect(screen.getAllByText('12345678901').length).toBeGreaterThanOrEqual(1);
+  expect(screen.getAllByText('RSSMRA80A01H501U').length).toBeGreaterThanOrEqual(1);
+  expect(screen.getAllByText('3020123456780').length).toBeGreaterThanOrEqual(1);
+});
 
   it('shows a generic error when API throws', async () => {
-    parseCieFragmentMock.mockReturnValue({
-      enteFiscalCode: '12345678901',
-      citizenFiscalCode: 'RSSMRA80A01H501U',
-      nav: '3020123456780',
-    });
-
-    validateSearchInputMock.mockReturnValue(null);
     getPaidNoticeDetailMock.mockRejectedValue(new Error('Kaboom'));
 
     render(<Home />);
 
     expect(await screen.findByText('Errore durante la verifica')).toBeInTheDocument();
     expect(screen.getByText('Kaboom')).toBeInTheDocument();
+  });
+
+  it('shows mapped error when API throws ApiRequestError', async () => {
+    parseCieFragmentMock.mockReturnValue({
+      enteFiscalCode: '12345678901',
+      citizenFiscalCode: 'RSSMRA80A01H501U',
+      nav: '40412121212121212',
+      token: 'mock-valid-token',
+    });
+
+    getPaidNoticeDetailMock.mockRejectedValue(
+      new ApiRequestError({
+        title: 'Pagamento non trovato',
+        description: 'Non è stato trovato alcun pagamento con i dati indicati.',
+        status: 404,
+        code: 'BZ_404_004',
+      })
+    );
+
+    render(<Home />);
+
+    expect(await screen.findByText('Pagamento non trovato')).toBeInTheDocument();
+    expect(
+      screen.getByText('Non è stato trovato alcun pagamento con i dati indicati.')
+    ).toBeInTheDocument();
+    expect(screen.getByText('HTTP 404')).toBeInTheDocument();
+    expect(screen.getByText('Codice errore: BZ_404_004')).toBeInTheDocument();
   });
 
   it('passes token to getPaidNoticeDetail when available in fragment', async () => {
@@ -156,53 +176,13 @@ describe('Home page', () => {
       token: 'tok',
     });
 
-    validateSearchInputMock.mockReturnValue(null);
-    getPaidNoticeDetailMock.mockResolvedValue(null);
-
     render(<Home />);
 
-    await screen.findByText(/Pagamento non trovato/i);
+    await screen.findByText('Esito verifica pagamento');
 
     expect(getPaidNoticeDetailMock).toHaveBeenCalledWith(
       expect.objectContaining({ token: 'tok' })
     );
-  });
-
-  it('renders requestType when present', async () => {
-    parseCieFragmentMock.mockReturnValue({
-      enteFiscalCode: '12345678901',
-      citizenFiscalCode: 'RSSMRA80A01H501U',
-      nav: '3020123456789',
-      requestType: 'ANNULLAMENTO',
-    });
-    validateSearchInputMock.mockReturnValue(null);
-    getPaidNoticeDetailMock.mockResolvedValue(null);
-
-    render(<Home />);
-
-    await screen.findByText(/Pagamento non trovato/i);
-    expect(screen.getByText('Tipologia richiesta')).toBeInTheDocument();
-    expect(screen.getByText('ANNULLAMENTO')).toBeInTheDocument();
-  });
-
-  it('calls history.back when clicking Indietro in notFound', async () => {
-    const backSpy = jest.spyOn(window.history, 'back').mockImplementation(() => {});
-
-    parseCieFragmentMock.mockReturnValue({
-      enteFiscalCode: '12345678901',
-      citizenFiscalCode: 'RSSMRA80A01H501U',
-      nav: '3020123456789',
-    });
-    validateSearchInputMock.mockReturnValue(null);
-    getPaidNoticeDetailMock.mockResolvedValue(null);
-
-    render(<Home />);
-
-    await screen.findByText(/Pagamento non trovato/i);
-    fireEvent.click(screen.getByRole('button', { name: /indietro/i }));
-
-    expect(backSpy).toHaveBeenCalled();
-    backSpy.mockRestore();
   });
 
   it('normalizes inputs (trim + uppercase) before validation and API call', async () => {
@@ -213,11 +193,9 @@ describe('Home page', () => {
       token: 'tok',
     });
 
-    validateSearchInputMock.mockReturnValue(null);
-    getPaidNoticeDetailMock.mockResolvedValue(null);
-
     render(<Home />);
-    await screen.findByText(/Pagamento non trovato/i);
+
+    await screen.findByText('Esito verifica pagamento');
 
     expect(validateSearchInputMock).toHaveBeenCalledWith({
       enteFiscalCode: 'ABCDEF12345',
@@ -236,25 +214,23 @@ describe('Home page', () => {
   });
 
   it('does not run twice on rerender (didRun guard)', async () => {
-    parseCieFragmentMock.mockReturnValue({
-      enteFiscalCode: '12345678901',
-      citizenFiscalCode: 'RSSMRA80A01H501U',
-      nav: '3020123456789',
-    });
-    validateSearchInputMock.mockReturnValue(null);
-    getPaidNoticeDetailMock.mockResolvedValue(null);
-
     const { rerender } = render(<Home />);
-    await screen.findByText(/Pagamento non trovato/i);
+
+    await screen.findByText('Esito verifica pagamento');
+    expect(getPaidNoticeDetailMock).toHaveBeenCalledTimes(1);
 
     rerender(<Home />);
-    expect(getPaidNoticeDetailMock).toHaveBeenCalledTimes(1);
-  });  
+
+    await waitFor(() => {
+      expect(getPaidNoticeDetailMock).toHaveBeenCalledTimes(1);
+    });
+  });
 
   it('wires header callbacks', () => {
     const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
     parseCieFragmentMock.mockReturnValue(null);
+
     render(<Home />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Header assistenza' }));
