@@ -144,7 +144,7 @@ describe('getPaidNoticeDetail', () => {
         debtorFiscalCode: 'RSSMRA80A01H501U',
         nav: '3020123456789',
       })
-    ).rejects.toThrow('Errore verifica (418)');
+    ).rejects.toThrow('Errore verifica');
   });
 
     it('throws when base url env is missing', async () => {

@@ -73,7 +73,7 @@ export async function getPaidNoticeDetail(payload: {
             return throwMappedError(response.status);
 
           default:
-            throw new Error(`Errore verifica (${response.status})`);
+            throw new Error(`Errore verifica`);
         }
       }
     )
