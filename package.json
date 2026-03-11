@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "lint-autofix": "eslint . --fix",
     "generate": "npm-run-all generate:*",
-    "generate:biz-events-search-transactions-v1": "rimraf generated/definitions/biz-events-search-transactions-v1 && shx mkdir -p generated/definitions/biz-events-search-transactions-v1 && gen-api-models --api-spec https://raw.githubusercontent.com/pagopa/pagopa-infra/ea2121d320af6b9a75c43af61baff3595a2d4897/src/domains/shared-app/api/search-transactions-service/v1/_openapi.json.tpl --no-strict --out-dir ./generated/definitions/biz-events-search-transactions-v1 --request-types --response-decoders --client",
+    "generate:biz-events-search-transactions-v1": "rimraf generated/definitions/biz-events-search-transactions-v1 && shx mkdir -p generated/definitions/biz-events-search-transactions-v1 && gen-api-models --api-spec https://raw.githubusercontent.com/pagopa/pagopa-infra/f179a862ade231261e8451a30c1711125d91b46a/src/domains/shared-app/api/search-transactions-service/v1/_openapi.json.tpl --no-strict --out-dir ./generated/definitions/biz-events-search-transactions-v1 --request-types --response-decoders --client",
     "prebuild": "npm run generate"
   },
   "dependencies": {
