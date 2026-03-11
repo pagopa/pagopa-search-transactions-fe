@@ -35,12 +35,10 @@ export default function Home() {
   );
 
   const runCheck = useCallback(async () => {
-    console.log("starting run check");
     setLoading(true);
     setError(null);
     setResult(null);
     setNotFound(false);
-    console.log("end set");
 
     const parsed = parseCieFragment(window.location.hash);
     if (!parsed) {
@@ -48,12 +46,11 @@ export default function Home() {
       setError({
         title: 'Parametri mancanti',
         description:
-          'Apri questa pagina dal gestionale CIE tramite redirect (CF Ente, CF Cittadino e NAV devono essere nel fragment URL).',
+          'Apri questa pagina dal gestionale CIE tramite redirect (CF Ente, CF Cittadino e NAV devono essere nel fragment URL oltre al token di sicurezza).',
       });
       setLoading(false);
       return;
     }
-          console.log("starting setPayload");
 
     setPayload(parsed);
 
@@ -63,23 +60,18 @@ export default function Home() {
       nav: parsed.nav.trim(),
     };
 
-          console.log("starting validateSearchInput");
     const validationError = validateSearchInput(input);
     if (validationError) {
-      console.log(" validation error");
       setError({
         title: 'Parametri non validi',
         description: validationError,
       });
-            console.log(" setting loading false");
 
       setLoading(false);
       return;
     }
 
     try {
-            console.log(" start getPaidNoticeDetail");
-
       const response = await getPaidNoticeDetail({
         organizationFiscalCode: input.enteFiscalCode,
         debtorFiscalCode: input.citizenFiscalCode,
@@ -95,25 +87,19 @@ export default function Home() {
         setNotFound(true);
       }
     } catch (e) {
-            console.log(" start error get paid notice");
       const message = e instanceof Error ? e.message : 'Errore durante la verifica del pagamento';
       setError({
         title: 'Errore durante la verifica',
         description: message,
       });
     } finally {
-      console.log(" finally ");
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    console.log("use effect start");
     if (didRun.current) return;
-        console.log("didRun.current false");
-
     didRun.current = true;
-     console.log("call runCheck");
     void runCheck();
   }, [runCheck]);
 
