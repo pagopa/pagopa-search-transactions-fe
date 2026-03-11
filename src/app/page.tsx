@@ -44,7 +44,7 @@ export default function Home() {
       setError({
         title: 'Parametri mancanti',
         description:
-          'Apri questa pagina dal gestionale CIE tramite redirect (CF Ente, CF Cittadino e NAV devono essere nel fragment URL).',
+          'Apri questa pagina dal gestionale CIE tramite redirect (CF Ente, CF Cittadino e NAV devono essere nel fragment URL oltre al token di sicurezza).',
       });
       setLoading(false);
       return;

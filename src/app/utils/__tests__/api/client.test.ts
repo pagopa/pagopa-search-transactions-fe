@@ -60,7 +60,7 @@ describe('createBizEventsSearchTransactionsClient', () => {
 
     const [, init] = fetchMock.mock.calls[0];
     expect(init.headers.get('x-test')).toBe('1');
-    expect(init.headers.get('token')).toBe('tok-123');
+    expect(init.headers.get('Authorization')).toBe('Bearer tok-123');
   });
 
   it('works without token and with empty envs', async () => {
