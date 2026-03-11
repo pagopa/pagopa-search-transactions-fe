@@ -9,14 +9,14 @@ describe('parseCieFragment', () => {
   });
 
   it('parses key=value format using aliases', () => {
-    const hash = '#cfEnte=12345678901&cfCittadino=RSSMRA80A01H501U&iuv=302012345678';
+    const hash = '#cfEnte=12345678901&cfCittadino=RSSMRA80A01H501U&iuv=302012345678&token=test-token';
     const parsed = parseCieFragment(hash);
 
     expect(parsed).toEqual({
       enteFiscalCode: '12345678901',
       citizenFiscalCode: 'RSSMRA80A01H501U',
       nav: '302012345678',
-      token: undefined,
+      token: 'test-token',
       requestType: undefined,
     });
   });
