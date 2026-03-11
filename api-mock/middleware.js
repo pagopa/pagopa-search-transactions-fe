@@ -32,7 +32,7 @@ module.exports = function (req, res, next) {
   const organizationFiscalCode = decodeURIComponent(match[1]);
   const nav = decodeURIComponent(match[2]);
   const debtorFiscalCode = req.get('x-fiscal-code');
-  const token = req.get('token');
+  const token = req.get('Authorization')?.replace('Bearer ', '');
 
   if (!debtorFiscalCode) {
     return res.status(400).jsonp(
