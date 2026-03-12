@@ -65,32 +65,8 @@ stages:
       - job: run_unit_tests
         steps:
         - template: templates/node-job-setup/template.yaml@pagopaCommons
-          displayName: 'Prepare SonarCloud analysis configuration'
-          inputs:
-            SonarCloud: "SONARCLOUD-SERVICE-CONN"
-            organization: "pagopa"
-            scannerMode: 'CLI'
-            configMode: 'manual'
-            cliProjectKey: 'pagopa_pagopa-search-transactions-fe'
-            cliProjectName: 'pagopa-search-transactions-fe'
-            cliSources: '.'
-            extraProperties: |
-              sonar.javascript.lcov.reportPaths=coverage/lcov.info
-              sonar.clover.reportPath=coverage/clover.xml
-              sonar.testExecutionReportPaths=test-report.xml
-              sonar.sourceEncoding=UTF-8
-              sonar.sources=src/
-              sonar.exclusions=src/**/__tests__/**/*,src/**/__test__/**,**/*.js,src/**/index.ts,src/**/__mocks__/**/*,/src/utils/testing/**
-              sonar.tests=src
-              sonar.test.inclusions=src/**/__tests__/**/*,src/**/__test__/**
-              sonar.cpd.exclusions=src/**/__tests__/**,src/**/__test__/**,__mocks__/**,/src/utils/testing/**
 
         - script: |
             yarn generate
             yarn test:coverage --watchAll=false
           displayName: 'Unit tests execution'
-          inputs:
-            codeCoverageTool: 'Cobertura'
-            summaryFileLocation: 'coverage/clover.xml'
-            reportDirectory: 'coverage'
-          displayName: 'Publish Code Coverage on Azure Devops'
