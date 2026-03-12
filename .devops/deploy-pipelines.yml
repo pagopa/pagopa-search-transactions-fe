@@ -107,7 +107,7 @@ stages:
   - stage: "Build_release_candidate"
     displayName: 'Build release candidate'
     dependsOn: []
-    condition:
+    condition: |
       and(
         succeeded(),
         eq(${{parameters.UAT_PROD_DEPLOY}}, true),
@@ -174,7 +174,7 @@ stages:
   - stage: "Deploy_UAT_Green"
     displayName: 'UAT green deployment'
     dependsOn: [Get_Release_Version, tag_docker_release]
-    condition:
+    condition: |
       and(
         succeeded(),
         eq(${{parameters.UAT_PROD_DEPLOY}}, true),
