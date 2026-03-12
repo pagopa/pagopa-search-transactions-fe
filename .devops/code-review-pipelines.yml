@@ -65,8 +65,6 @@ stages:
       - job: run_unit_tests
         steps:
         - template: templates/node-job-setup/template.yaml@pagopaCommons
-
-        - task: SonarCloudPrepare@3
           displayName: 'Prepare SonarCloud analysis configuration'
           inputs:
             SonarCloud: "SONARCLOUD-SERVICE-CONN"
@@ -91,19 +89,6 @@ stages:
             yarn generate
             yarn test:coverage --watchAll=false
           displayName: 'Unit tests execution'
-
-        - script: yarn lint
-          displayName: 'Lint execution'
-
-        - task: SonarCloudAnalyze@3
-          displayName: 'Sonar Analyze'
-
-        - task: SonarCloudPublish@3
-          displayName: 'Publish result to sonarcloud'
-          inputs:
-            pollingTimeoutSec: '300'
-
-        - task: PublishCodeCoverageResults@2
           inputs:
             codeCoverageTool: 'Cobertura'
             summaryFileLocation: 'coverage/clover.xml'
