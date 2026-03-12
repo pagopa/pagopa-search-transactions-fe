@@ -111,11 +111,12 @@ stages:
       and(
         succeeded(),
         eq(${{parameters.UAT_PROD_DEPLOY}}, true),
-        or(
-          eq(variables['Build.SourceBranch'], 'refs/heads/main'),
-          startsWith(variables['Build.SourceBranch'], 'refs/tags')
         )
-      )
+#        or( 
+#          eq(variables['Build.SourceBranch'], 'refs/heads/main'), 
+#          startsWith(variables['Build.SourceBranch'], 'refs/tags') 
+#        ) 
+#      )
     variables:
       search_transactions_service_api_host: 'https://api.uat.platform.pagopa.it'
       search_transactions_base_path: '/searchtransactions/v1'
