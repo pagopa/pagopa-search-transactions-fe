@@ -7,7 +7,7 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-    types: [labeled]
+    types: [labeled, unlabeled]
 jobs:
   test:
     if: github.event.label.name == 'playwright'
@@ -27,11 +27,11 @@ jobs:
     - name: Set env for E2E test (DEV)
       run: cp tests/e2e-tests/dev.env tests/e2e-tests/.env && sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{secrets.SEARCH_TRANSACTIONS_TOKEN_DEV}}/" tests/e2e-tests/.env
     - name: Run Playwright tests dev
-      run: dotenv -e tests/e2e-tests/.env playwright test tests/e2e
+      run: yarn e2e-tests
     - name: Set env for E2E test (UAT)
       run: cp tests/e2e-tests/uat.env tests/e2e-tests/.env && sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{secrets.SEARCH_TRANSACTIONS_TOKEN_UAT}}/" tests/e2e-tests/.env
     - name: Run Playwright tests uat
-      run: dotenv -e tests/e2e-tests/.env playwright test tests/e2e
+      run: yarn e2e-tests
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
