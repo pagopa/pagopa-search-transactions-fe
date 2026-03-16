@@ -108,7 +108,7 @@ stages:
     jobs:
       - job: e2e_tests_dev
         steps:
-        - template: .devops/azure-templates/e2e-tests.yaml
+        - template: azure-templates/e2e-tests.yaml
           parameters:
             ENVIRONMENT: DEV
             SEARCH_TRANSACTIONS_TOKEN_DEV: $(SEARCH_TRANSACTIONS_TOKEN_DEV)
@@ -235,7 +235,7 @@ stages:
     jobs:
       - job: e2e_tests_uat
         steps:
-        - template: .devops/azure-templates/e2e-tests.yaml
+        - template: azure-templates/e2e-tests.yaml
           parameters:
             ENVIRONMENT: UAT
             SEARCH_TRANSACTIONS_TOKEN_UAT: $(SEARCH_TRANSACTIONS_TOKEN_UAT)
