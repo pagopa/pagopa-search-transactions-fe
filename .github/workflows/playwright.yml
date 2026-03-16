@@ -7,7 +7,7 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-    types: [labeled, unlabeled]
+    types: [labeled]
 jobs:
   test:
     if: github.event.label.name == 'playwright'

@@ -23,7 +23,7 @@ steps:
     displayName: 'Set env for E2E test (UAT)'
     condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'UAT'))
 
-  - script: dotenv -e tests/e2e-tests/.env playwright test tests/e2e
+  - script: yarn e2e-tests
     displayName: 'Playwright E2E tests'
     continueOnError: true
 
