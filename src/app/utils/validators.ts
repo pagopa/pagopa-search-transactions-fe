@@ -15,13 +15,13 @@ export function validateSearchInput(input: {
     return 'Tutti i campi sono obbligatori.';
   }
   if (!matchFiscalCode(input.enteFiscalCode)) {
-    return 'CF Ente non valido.';
+    return 'Il codice fiscale ente indicato non è formalmente corretto.';
   }
   if (!matchFiscalCode(input.citizenFiscalCode)) {
-    return 'CF Cittadino non valido.';
+    return 'Il codice fiscale cittadino indicato non è formalmente corretto.';
   }
   if (!matchNav(input.nav)) {
-    return 'Numero avviso / NAV non valido.';
+    return 'Il numero avviso / NAV indicato non è valido per questa richiesta.';
   }
   return null;
 }

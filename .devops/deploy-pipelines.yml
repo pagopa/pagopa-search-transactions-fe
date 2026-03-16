@@ -50,7 +50,7 @@ pool:
 
 stages:
   # --- START Deploy DEV --- #
-  - stage: 'Build_for_DEV'
+  - stage: "Build_for_DEV"
     displayName: 'Build for DEV'
     condition: and(succeeded(), not(${{ parameters.SKIP_BUILD }}), eq(${{parameters.DEV_DEPLOY}}, true))
     variables:
@@ -69,7 +69,7 @@ stages:
               FORCE_REPLACE_DOCKER_IMAGE: ${{ parameters.FORCE_REPLACE_DOCKER_IMAGE }}
               DOCKER_BUILD_ARGS: --build-arg NEXT_PUBLIC_CIE_SEARCH_API_BASE_URL=$(search_transactions_service_api_host) --build-arg NEXT_PUBLIC_CIE_SEARCH_API_BASE_PATH=$(search_transactions_base_path)
 
-  - stage: 'Deploy_for_DEV'
+  - stage: "Deploy_for_DEV"
     displayName: 'Deploy DEV'
     dependsOn: Build_for_DEV
     condition: or(succeeded(), ${{ parameters.SKIP_BUILD }}, eq(${{parameters.DEV_DEPLOY}}, true) )
@@ -100,8 +100,19 @@ stages:
                     VALUE_FILE: "helm/values-dev.yaml"
                     GREEN_VERSION: $(Build.SourceVersion)
                     BLUE_VERSION: $(Build.SourceVersion)
-  # --- END Deploy DEV --- #
 
+  - stage: "End_to_End_Tests_DEV"
+    pool:
+      vmImage: 'ubuntu-latest'
+    dependsOn: [Deploy_for_DEV]
+    jobs:
+      - job: e2e_tests_dev
+        steps:
+        - template: .devops/azure-templates/e2e-tests.yaml
+          parameters:
+            ENVIRONMENT: DEV
+            SEARCH_TRANSACTIONS_TOKEN_DEV: $(SEARCH_TRANSACTIONS_TOKEN_DEV)
+  # --- END Deploy DEV --- #
 
   # --- START Deploy UAT --- #
   - stage: "Build_release_candidate"
@@ -216,6 +227,18 @@ stages:
                     APP_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
                     VALUE_FILE: "helm/values-uat.yaml"
                     GREEN_VERSION: $(app_version)
+  
+  - stage: "End_to_End_Tests_UAT"
+    pool:
+        vmImage: 'ubuntu-latest'
+    dependsOn: [Deploy_UAT_Green]
+    jobs:
+      - job: e2e_tests_uat
+        steps:
+        - template: .devops/azure-templates/e2e-tests.yaml
+          parameters:
+            ENVIRONMENT: UAT
+            SEARCH_TRANSACTIONS_TOKEN_UAT: $(SEARCH_TRANSACTIONS_TOKEN_UAT)
   # --- END Deploy UAT --- #
 
   # --- START Deploy PROD --- #

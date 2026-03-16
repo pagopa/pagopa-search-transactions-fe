@@ -85,6 +85,27 @@
         "detail": "Unexpected error",
         "code": "UN_500_000"
       }
+    },
+    {
+      "id": 8,
+      "organizationFiscalCode": "00493410583",
+      "debtorFiscalCode": "44445554444",
+      "nav": "39912121212121212",
+      "status": 200,
+      "body": {
+        "subject": "Pagamento BPAY",
+        "amount": "2681.52",
+        "payee": {
+          "name": "testVCompanyName007",
+          "taxCode": "00493410583"
+        },
+        "debtor": {
+          "name": "CICCIO DEBTOR",
+          "taxCode": "44445554444"
+        },
+        "refNumberValue": "39912121212121212",
+        "refNumberType": "codiceAvviso"
+      }
     }
   ]
 }

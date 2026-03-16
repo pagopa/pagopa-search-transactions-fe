@@ -105,12 +105,12 @@ describe('Home page', () => {
       nav: 'zzz',
     });
 
-    validateSearchInputMock.mockReturnValue('CF Ente non valido.');
+    validateSearchInputMock.mockReturnValue('Il codice fiscale ente indicato non è formalmente corretto.');
 
     render(<Home />);
 
     expect(await screen.findByText('Parametri non validi')).toBeInTheDocument();
-    expect(screen.getByText('CF Ente non valido.')).toBeInTheDocument();
+    expect(screen.getByText('Il codice fiscale ente indicato non è formalmente corretto.')).toBeInTheDocument();
     expect(getPaidNoticeDetailMock).not.toHaveBeenCalled();
   });
 

@@ -1,0 +1,35 @@
+parameters:
+  # Required
+  - name: "ENVIRONMENT"
+    type: string
+    values:
+      - DEV
+      - UAT
+    default: DEV
+  - name: "SEARCH_TRANSACTIONS_TOKEN_DEV"
+    type: string
+    default: ''
+  - name: "SEARCH_TRANSACTIONS_TOKEN_UAT"
+    type: string
+    default: ''
+
+steps:
+  - script: |
+      rm -f tests/e2e-tests/.env && cp tests/e2e-tests/dev.env tests/e2e-tests/.env && sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_DEV}}/" tests/e2e-tests/.env
+    displayName: 'Set env for E2E test (DEV)'
+    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
+  - script: |
+      rm -f tests/e2e-tests/.env && cp tests/e2e-tests/uat.env tests/e2e-tests/.env && sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_UAT}}/" tests/e2e-tests/.env
+    displayName: 'Set env for E2E test (UAT)'
+    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'UAT'))
+
+  - script: dotenv -e tests/e2e-tests/.env playwright test tests/e2e
+    displayName: 'Playwright E2E tests'
+    continueOnError: true
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/*-TEST.xml'
+      searchFolder: '$(System.DefaultWorkingDirectory)'
+    condition: succeededOrFailed()

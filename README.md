@@ -128,3 +128,18 @@ Run tests with coverage:
 ```bash
 yarn test:coverage
 ```
+
+
+## End-2-End tests
+
+For run e2e tests in dev, from your pc, remember to edit `SEARCH_TRANSACTIONS_TOKEN` in `tests/e2e-tests/dev.env`
+Then you can run
+```bash
+yarn e2e-tests-dev
+```
+
+For run e2e tests in uat, from your pc, remember to edit `SEARCH_TRANSACTIONS_TOKEN` in `tests/e2e-tests/uat.env`
+Then you can run
+```bash
+yarn e2e-tests-uat
+```
