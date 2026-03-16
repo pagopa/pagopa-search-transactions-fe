@@ -32,7 +32,7 @@ test.describe('Search Transactions - E2E Tests', () => {
     });
 
     test('should show full page error when ente fiscal code is invalid', async ({ page }) => {
-        await page.goto(`${BASE_URL}#?enteFiscalCode=${ENTE_FISCAL_CODE_INVALID}&citizenFiscalCode=${CITIZEN_FISCAL_CODE}&nav=${NAV}&token=${TOKEN}`);
+        await page.goto(`${BASE_URL}#enteFiscalCode=${ENTE_FISCAL_CODE_INVALID}&citizenFiscalCode=${CITIZEN_FISCAL_CODE}&nav=${NAV}&token=${TOKEN}`);
 
         const alert = page
             .getByRole('alert')
@@ -46,7 +46,7 @@ test.describe('Search Transactions - E2E Tests', () => {
     });
 
     test('should show full page error when citizen fiscal code is invalid', async ({ page }) => {
-        await page.goto(`${BASE_URL}#?enteFiscalCode=${ENTE_FISCAL_CODE}&citizenFiscalCode=${CITIZEN_FISCAL_CODE_INVALID}&nav=${NAV}&token=${TOKEN}`);
+        await page.goto(`${BASE_URL}#enteFiscalCode=${ENTE_FISCAL_CODE}&citizenFiscalCode=${CITIZEN_FISCAL_CODE_INVALID}&nav=${NAV}&token=${TOKEN}`);
 
         const alert = page
             .getByRole('alert')
@@ -60,7 +60,7 @@ test.describe('Search Transactions - E2E Tests', () => {
     });
 
     test('should show full page error when NAV code is invalid', async ({ page }) => {
-        await page.goto(`${BASE_URL}#?enteFiscalCode=${ENTE_FISCAL_CODE}&citizenFiscalCode=${CITIZEN_FISCAL_CODE}&nav=${NAV_INVALID}&token=${TOKEN}`);
+        await page.goto(`${BASE_URL}#enteFiscalCode=${ENTE_FISCAL_CODE}&citizenFiscalCode=${CITIZEN_FISCAL_CODE}&nav=${NAV_INVALID}&token=${TOKEN}`);
         const alert = page
             .getByRole('alert')
             .filter({ hasText: 'Parametri non validi' });
@@ -73,7 +73,7 @@ test.describe('Search Transactions - E2E Tests', () => {
     });
 
     test('should show full page error when TOKEN code is invalid', async ({ page }) => {
-        await page.goto(`${BASE_URL}#?enteFiscalCode=${ENTE_FISCAL_CODE}&citizenFiscalCode=${CITIZEN_FISCAL_CODE}&nav=${NAV}&token=${TOKEN_INVALID}`);
+        await page.goto(`${BASE_URL}#enteFiscalCode=${ENTE_FISCAL_CODE}&citizenFiscalCode=${CITIZEN_FISCAL_CODE}&nav=${NAV}&token=${TOKEN_INVALID}`);
         const alert = page
             .getByRole('alert')
             .filter({ hasText: 'Utente non autorizzato' });
@@ -86,7 +86,7 @@ test.describe('Search Transactions - E2E Tests', () => {
     });
 
     test('should show full page error when NAV code is different', async ({ page }) => {
-        await page.goto(`${BASE_URL}#?enteFiscalCode=${ENTE_FISCAL_CODE}&citizenFiscalCode=${CITIZEN_FISCAL_CODE}&nav=${NAV_DIFFERENT}&token=${TOKEN}`);
+        await page.goto(`${BASE_URL}#enteFiscalCode=${ENTE_FISCAL_CODE}&citizenFiscalCode=${CITIZEN_FISCAL_CODE}&nav=${NAV_DIFFERENT}&token=${TOKEN}`);
         const alert = page
             .getByRole('alert')
             .filter({ hasText: 'Pagamento non trovato' });
@@ -100,7 +100,7 @@ test.describe('Search Transactions - E2E Tests', () => {
 
     test('should show paid notice result with request data and payment details', async ({ page }) => {
         await page.goto(
-            `${BASE_URL}#?enteFiscalCode=${ENTE_FISCAL_CODE}&citizenFiscalCode=${CITIZEN_FISCAL_CODE}&nav=${NAV}&token=${TOKEN}`
+            `${BASE_URL}#enteFiscalCode=${ENTE_FISCAL_CODE}&citizenFiscalCode=${CITIZEN_FISCAL_CODE}&nav=${NAV}&token=${TOKEN}`
         );
 
         const main = page.locator('main');
@@ -130,7 +130,7 @@ test.describe('Search Transactions - E2E Tests', () => {
 
     test('should show rate limit error after repeated requests trigger 429', async ({ page }) => {
         const url =
-            `${BASE_URL}#?enteFiscalCode=${ENTE_FISCAL_CODE}` +
+            `${BASE_URL}#enteFiscalCode=${ENTE_FISCAL_CODE}` +
             `&citizenFiscalCode=${CITIZEN_FISCAL_CODE}` +
             `&nav=${NAV}` +
             `&token=${TOKEN}`;
