@@ -86,10 +86,10 @@ stages:
           - script: yarn install && yarn build
             displayName: 'Setup deps'
 
-          - script: yarn mock-server
+          - script: yarn mock-server &
             displayName: 'Run mock-server'
 
-          - script: yarn start
+          - script: yarn start &
             displayName: 'Run frontend'
 
           - script: yarn integration-tests
