@@ -22,7 +22,7 @@ steps:
     displayName: 'Set env for E2E test (DEV)'
     condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
   - script: |
-      sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_UAT}}/" tests/e2e-tests/ust.env
+      sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_UAT}}/" tests/e2e-tests/uat.env
     displayName: 'Set env for E2E test (UAT)'
     condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'UAT'))
 
