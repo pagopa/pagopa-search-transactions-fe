@@ -18,7 +18,7 @@ steps:
     displayName: 'Install dependencies'
 
   - script: yarn playwright install --with-deps
-    displayName: Install Playwright Browsers
+    displayName: 'Install Playwright Browsers'
 
   - script: |
       sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_DEV}}/" tests/e2e-tests/dev.env
