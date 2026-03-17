@@ -201,6 +201,7 @@ it('renders the paid notice result and request summary when API returns a detail
       enteFiscalCode: 'ABCDEF12345',
       citizenFiscalCode: 'RSSMRA80A01H501U',
       nav: '3020',
+      token: 'tok',
     });
 
     expect(getPaidNoticeDetailMock).toHaveBeenCalledWith(
