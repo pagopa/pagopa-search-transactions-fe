@@ -30,7 +30,7 @@ describe('validators', () => {
         citizenFiscalCode: 'RSSMRA80A01H501U',
         nav: '302012345678',
       })
-    ).toBe('CF Ente non valido.');
+    ).toBe('Il codice fiscale ente indicato non è formalmente corretto.');
   });
 
   it('returns an error message when the citizen fiscal code is invalid', () => {
@@ -40,7 +40,7 @@ describe('validators', () => {
         citizenFiscalCode: '???',
         nav: '302012345678',
       })
-    ).toBe('CF Cittadino non valido.');
+    ).toBe('Il codice fiscale cittadino indicato non è formalmente corretto.');
   });
 
   it('returns an error message when the NAV is invalid', () => {
@@ -50,7 +50,7 @@ describe('validators', () => {
         citizenFiscalCode: 'RSSMRA80A01H501U',
         nav: '12',
       })
-    ).toBe('Numero avviso / NAV non valido.');
+    ).toBe('Il numero avviso / NAV indicato non è valido per questa richiesta.');
   });
 
   it('returns null when the input is valid', () => {

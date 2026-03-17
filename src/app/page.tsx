@@ -56,6 +56,7 @@ export default function Home() {
       enteFiscalCode: parsed.enteFiscalCode.trim().toUpperCase(),
       citizenFiscalCode: parsed.citizenFiscalCode.trim().toUpperCase(),
       nav: parsed.nav.trim(),
+      token: parsed.token?.trim(),
     };
 
     const validationError = validateSearchInput(input);
@@ -73,7 +74,7 @@ export default function Home() {
         organizationFiscalCode: input.enteFiscalCode,
         debtorFiscalCode: input.citizenFiscalCode,
         nav: input.nav,
-        token: parsed.token,
+        token: input.token,
       });
 
       setResult(response);

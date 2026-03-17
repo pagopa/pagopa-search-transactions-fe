@@ -21,7 +21,7 @@ const config: Config = {
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testResultsProcessor: 'jest-sonar-reporter',
-  testPathIgnorePatterns: ['/mock/'],
+  testPathIgnorePatterns: ['/api-mock/','/tests/'],
   testMatch: ['**/?(*.)+(test|spec).[tj]s?(x)'],
   globals: {
     fetch: globalThis.fetch,

@@ -99,7 +99,7 @@ describe('toUiError', () => {
   it('maps generic 404 without known code', () => {
     expect(mapProblemToUiError(404)).toEqual({
       title: 'Pagamento non trovato',
-      description: 'Non è stato trovato alcun pagamento con i dati indicati.',
+      description: 'Non è stato trovato alcun pagamento con codice fiscale e numero avviso indicati.',
       status: 404,
       code: undefined,
     });

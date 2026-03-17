@@ -13,7 +13,7 @@ export default function FullPageError({ title, description, status, code }: Prop
   return (
     <Box minHeight={280} display="flex" justifyContent="center" alignItems="center">
       <Box width="100%" maxWidth={720}>
-        <Alert severity="error">
+        <Alert severity="error" role='alert'>
           <AlertTitle>{title}</AlertTitle>
           {description}
           {(status || code) && (

@@ -105,12 +105,12 @@ describe('Home page', () => {
       nav: 'zzz',
     });
 
-    validateSearchInputMock.mockReturnValue('CF Ente non valido.');
+    validateSearchInputMock.mockReturnValue('Il codice fiscale ente indicato non è formalmente corretto.');
 
     render(<Home />);
 
     expect(await screen.findByText('Parametri non validi')).toBeInTheDocument();
-    expect(screen.getByText('CF Ente non valido.')).toBeInTheDocument();
+    expect(screen.getByText('Il codice fiscale ente indicato non è formalmente corretto.')).toBeInTheDocument();
     expect(getPaidNoticeDetailMock).not.toHaveBeenCalled();
   });
 
@@ -152,7 +152,7 @@ it('renders the paid notice result and request summary when API returns a detail
     getPaidNoticeDetailMock.mockRejectedValue(
       new ApiRequestError({
         title: 'Pagamento non trovato',
-        description: 'Non è stato trovato alcun pagamento con i dati indicati.',
+        description: 'Non è stato trovato alcun pagamento con codice fiscale e numero avviso indicati.',
         status: 404,
         code: 'BZ_404_004',
       })
@@ -162,7 +162,7 @@ it('renders the paid notice result and request summary when API returns a detail
 
     expect(await screen.findByText('Pagamento non trovato')).toBeInTheDocument();
     expect(
-      screen.getByText('Non è stato trovato alcun pagamento con i dati indicati.')
+      screen.getByText('Non è stato trovato alcun pagamento con codice fiscale e numero avviso indicati.')
     ).toBeInTheDocument();
     expect(screen.getByText('HTTP 404')).toBeInTheDocument();
     expect(screen.getByText('Codice errore: BZ_404_004')).toBeInTheDocument();
@@ -201,6 +201,7 @@ it('renders the paid notice result and request summary when API returns a detail
       enteFiscalCode: 'ABCDEF12345',
       citizenFiscalCode: 'RSSMRA80A01H501U',
       nav: '3020',
+      token: 'tok',
     });
 
     expect(getPaidNoticeDetailMock).toHaveBeenCalledWith(
