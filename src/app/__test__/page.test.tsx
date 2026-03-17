@@ -152,7 +152,7 @@ it('renders the paid notice result and request summary when API returns a detail
     getPaidNoticeDetailMock.mockRejectedValue(
       new ApiRequestError({
         title: 'Pagamento non trovato',
-        description: 'Non è stato trovato alcun pagamento con i dati indicati.',
+        description: 'Non è stato trovato alcun pagamento con codice fiscale e numero avviso indicati.',
         status: 404,
         code: 'BZ_404_004',
       })
@@ -162,7 +162,7 @@ it('renders the paid notice result and request summary when API returns a detail
 
     expect(await screen.findByText('Pagamento non trovato')).toBeInTheDocument();
     expect(
-      screen.getByText('Non è stato trovato alcun pagamento con i dati indicati.')
+      screen.getByText('Non è stato trovato alcun pagamento con codice fiscale e numero avviso indicati.')
     ).toBeInTheDocument();
     expect(screen.getByText('HTTP 404')).toBeInTheDocument();
     expect(screen.getByText('Codice errore: BZ_404_004')).toBeInTheDocument();

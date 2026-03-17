@@ -82,7 +82,7 @@ export function mapProblemToUiError(status: number, problem?: ProblemJson): UiEr
   if (status === 404) {
     return {
       title: 'Pagamento non trovato',
-      description: 'Non è stato trovato alcun pagamento con i dati indicati.',
+      description: 'Non è stato trovato alcun pagamento con codice fiscale e numero avviso indicati.',
       status,
       code,
     };

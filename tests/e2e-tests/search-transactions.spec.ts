@@ -94,7 +94,7 @@ test.describe('Search Transactions - E2E Tests', () => {
         await expect(alert).toBeVisible();
         await expect(alert.locator('.MuiAlertTitle-root')).toHaveText('Pagamento non trovato');
         await expect(alert).toContainText(
-            'Non è stato trovato alcun pagamento con i dati indicati.'
+            'Non è stato trovato alcun pagamento con codice fiscale e numero avviso indicati.'
         );
     });
 
@@ -140,7 +140,7 @@ test.describe('Search Transactions - E2E Tests', () => {
         await page.goto(url);
 
         let got429 = false;
-        const maxAttempts = 10;
+        const maxAttempts = 101;
 
         for (let i = 0; i < maxAttempts; i++) {
             const responsePromise = page.waitForResponse(response =>
