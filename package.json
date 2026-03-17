@@ -17,8 +17,9 @@
     "generate:biz-events-search-transactions-v1": "rimraf generated/definitions/biz-events-search-transactions-v1 && shx mkdir -p generated/definitions/biz-events-search-transactions-v1 && gen-api-models --api-spec https://raw.githubusercontent.com/pagopa/pagopa-infra/f179a862ade231261e8451a30c1711125d91b46a/src/domains/shared-app/api/search-transactions-service/v1/_openapi.json.tpl --no-strict --out-dir ./generated/definitions/biz-events-search-transactions-v1 --request-types --response-decoders --client",
     "prebuild": "npm run generate",
     "e2e-tests": "playwright test tests/e2e --ui",
-    "e2e-tests-uat": "dotenv -e tests/e2e-tests/uat.env playwright test tests/e2e --ui",
-    "e2e-tests-dev": "dotenv -e tests/e2e-tests/dev.env playwright test tests/e2e --ui"
+    "e2e-tests-uat": "dotenv -e tests/e2e-tests/uat.env playwright test tests/e2e-tests",
+    "e2e-tests-dev": "dotenv -e tests/e2e-tests/dev.env playwright test tests/e2e-tests",
+    "integration-tests": "dotenv -e tests/integration-tests/local.env playwright test tests/integration-tests"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

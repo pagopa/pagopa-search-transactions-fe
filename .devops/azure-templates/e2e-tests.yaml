@@ -15,16 +15,22 @@ parameters:
 
 steps:
   - script: |
-      rm -f tests/e2e-tests/.env && cp tests/e2e-tests/dev.env tests/e2e-tests/.env && sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_DEV}}/" tests/e2e-tests/.env
+      sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_DEV}}/" tests/e2e-tests/dev.env
     displayName: 'Set env for E2E test (DEV)'
     condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
   - script: |
-      rm -f tests/e2e-tests/.env && cp tests/e2e-tests/uat.env tests/e2e-tests/.env && sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_UAT}}/" tests/e2e-tests/.env
+      sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_UAT}}/" tests/e2e-tests/ust.env
     displayName: 'Set env for E2E test (UAT)'
     condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'UAT'))
 
-  - script: yarn e2e-tests
-    displayName: 'Playwright E2E tests'
+  - script: yarn e2e-tests-dev
+    displayName: 'Playwright E2E tests DEV'
+    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
+    continueOnError: true
+
+  - script: yarn e2e-tests-uat
+    displayName: 'Playwright E2E tests UAT'
+    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'UAT'))
     continueOnError: true
 
   - task: PublishTestResults@2
