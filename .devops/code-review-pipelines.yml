@@ -87,7 +87,7 @@ stages:
             displayName: 'Setup deps'
 
           - script: yarn playwright install --with-deps
-            displayName: 'Install PlayWright'
+            displayName: 'Install Playwright Browsers'
 
           - script: yarn mock-server &
             displayName: 'Run mock-server'
