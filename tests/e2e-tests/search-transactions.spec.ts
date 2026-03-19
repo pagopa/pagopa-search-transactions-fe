@@ -11,7 +11,15 @@ const NAV_DIFFERENT = String(process.env.NAV_DIFFERENT);
 const TOKEN = String(process.env.SEARCH_TRANSACTIONS_TOKEN);
 const TOKEN_INVALID = String(process.env.SEARCH_TRANSACTIONS_TOKEN_INVALID);
 
+
+
 test.describe('Search Transactions - E2E Tests', () => {
+
+    test.afterEach(async () => {
+        // this timeout is added for rate limit
+        await new Promise(resolve => setTimeout(resolve, 2000));
+    });
+
     test('should load the search transactions page', async ({ page }) => {
         await page.goto(BASE_URL);
         await expect(page.locator('p')).toHaveText('Verifica pagamenti CIE');
