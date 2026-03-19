@@ -13,6 +13,11 @@ parameters:
     displayName: 'Unit tests'
     type: boolean
     default: true
+
+  - name: 'INTEGRATION_TESTS'
+    displayName: 'Integration tests'
+    type: boolean
+    default: true
     
 variables:
   NODE_VERSION: '22.13.1'
@@ -70,3 +75,33 @@ stages:
             yarn generate
             yarn test:coverage --watchAll=false
           displayName: 'Unit tests execution'
+
+  - stage: Integration_Tests
+    condition: and(succeeded(), eq('${{parameters.INTEGRATION_TESTS}}', true))
+    dependsOn: []
+    jobs:
+      - job: run_integration_tests
+        timeoutInMinutes: 30
+        steps:
+          - script: yarn install && yarn build
+            displayName: 'Setup deps'
+
+          - script: yarn playwright install --with-deps
+            displayName: 'Install Playwright Browsers'
+
+          - script: yarn mock-server &
+            displayName: 'Run mock-server'
+
+          - script: yarn start &
+            displayName: 'Run frontend'
+
+          - script: yarn integration-tests
+            displayName: 'Integration tests exec'
+
+          - task: PublishTestResults@2
+            displayName: 'Publish integration tests results'
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/*TEST.xml'
+              searchFolder: '$(System.DefaultWorkingDirectory)'
+              failTaskOnFailedTests: true

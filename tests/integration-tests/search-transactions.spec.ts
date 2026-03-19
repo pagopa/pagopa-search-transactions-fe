@@ -8,18 +8,11 @@ const CITIZEN_FISCAL_CODE_INVALID = String(process.env.CITIZEN_FISCAL_CODE_INVAL
 const NAV = String(process.env.NAV);
 const NAV_INVALID = String(process.env.NAV_INVALID);
 const NAV_DIFFERENT = String(process.env.NAV_DIFFERENT);
+const NAV_429 = String(process.env.NAV_429);
 const TOKEN = String(process.env.SEARCH_TRANSACTIONS_TOKEN);
 const TOKEN_INVALID = String(process.env.SEARCH_TRANSACTIONS_TOKEN_INVALID);
 
-
-
 test.describe('Search Transactions - E2E Tests', () => {
-
-    test.afterEach(async () => {
-        // this timeout is added for rate limit
-        await new Promise(resolve => setTimeout(resolve, 2000));
-    });
-
     test('should load the search transactions page', async ({ page }) => {
         await page.goto(BASE_URL);
         await expect(page.locator('p')).toHaveText('Verifica pagamenti CIE');
@@ -140,7 +133,7 @@ test.describe('Search Transactions - E2E Tests', () => {
         const url =
             `${BASE_URL}#enteFiscalCode=${ENTE_FISCAL_CODE}` +
             `&citizenFiscalCode=${CITIZEN_FISCAL_CODE}` +
-            `&nav=${NAV}` +
+            `&nav=${NAV_429}` +
             `&token=${TOKEN}`;
 
         const alert = page.getByRole('alert').filter({ hasText: 'Troppe richieste' });
