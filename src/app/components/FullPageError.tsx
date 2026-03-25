@@ -9,16 +9,21 @@ type Props = {
   code?: string;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function FullPageError({ title, description, status, code }: Props) {
   return (
     <Box minHeight={280} display="flex" justifyContent="center" alignItems="center">
       <Box width="100%" maxWidth={720}>
         <Alert severity="error" role='alert'>
-          <AlertTitle>{title}</AlertTitle>
-          {description}
-          {(status || code) && (
-            <Typography component="div" variant="caption" sx={{ mt: 1, display: 'block' }}>
-              {status ? `HTTP ${status}` : ''}
+           <AlertTitle>
+            <Typography variant="h6" component="span" fontWeight={600}>
+              {title}
+            </Typography>
+          </AlertTitle>
+
+          {description && (
+            <Typography variant="body1">
+              {description}
             </Typography>
           )}
         </Alert>
