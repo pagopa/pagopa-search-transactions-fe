@@ -15,7 +15,10 @@ const TOKEN_INVALID = String(process.env.SEARCH_TRANSACTIONS_TOKEN_INVALID);
 test.describe('Search Transactions - E2E Tests', () => {
     test('should load the search transactions page', async ({ page }) => {
         await page.goto(BASE_URL);
-        await expect(page.locator('p')).toHaveText('Verifica pagamenti CIE');
+        await expect(page.getByText('Verifica pagamenti CIE', { exact: true })).toBeVisible();
+
+        const alert = page.getByRole('alert').filter({ hasText: 'Parametri mancanti' });
+        await expect(alert).toBeVisible();
     });
 
     test('should show full page error when fragment params are missing', async ({ page }) => {
