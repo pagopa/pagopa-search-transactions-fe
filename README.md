@@ -143,3 +143,25 @@ Then you can run
 ```bash
 yarn e2e-tests-uat
 ```
+
+## Test Playwright with ui
+In `playwright.config.ts` enable
+```bash
+import dotenv from 'dotenv';
+import path from 'path';
+dotenv.config({ path: path.resolve(__dirname, 'tests/integration-tests/local.env') });
+```
+change .env path with env for test:
+- `tests/integration-tests/local.env` for integration tests
+- `tests/e2e-tests/dev.env` for dev e2e-tests
+- `tests/e2e-tests/uat.env` for uat e2e-tests
+
+then run:
+- for integration tests
+    ```bash
+    yarn playwright-integration-ui
+    ```
+- for e2d tests
+    ```bash
+    yarn playwright-e2e-ui
+    ```
