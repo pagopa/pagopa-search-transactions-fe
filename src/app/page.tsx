@@ -102,7 +102,6 @@ export default function Home() {
       />
 
       <HeaderProduct
-        chipLabel="Beta"
         productsList={[
           {
             title: 'Verifica pagamenti CIE',
