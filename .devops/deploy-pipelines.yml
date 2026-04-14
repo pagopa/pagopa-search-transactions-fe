@@ -112,6 +112,9 @@ stages:
           parameters:
             ENVIRONMENT: DEV
             SEARCH_TRANSACTIONS_TOKEN_DEV: $(SEARCH_TRANSACTIONS_TOKEN_DEV)
+            AZURE_COSMOS_URI_DEV: $(AZURE_COSMOS_URI_DEV)
+            AZURE_COSMOS_KEY_DEV: $(AZURE_COSMOS_KEY_DEV)
+
   # --- END Deploy DEV --- #
 
   # --- START Deploy UAT --- #
@@ -239,6 +242,8 @@ stages:
           parameters:
             ENVIRONMENT: UAT
             SEARCH_TRANSACTIONS_TOKEN_UAT: $(SEARCH_TRANSACTIONS_TOKEN_UAT)
+            AZURE_COSMOS_URI_UAT: $(AZURE_COSMOS_URI_UAT)
+            AZURE_COSMOS_KEY_UAT: $(AZURE_COSMOS_KEY_UAT)
   # --- END Deploy UAT --- #
 
   # --- START Deploy PROD --- #
