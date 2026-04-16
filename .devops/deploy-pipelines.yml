@@ -60,10 +60,6 @@ stages:
       - job: Build_docker
         displayName: Build docker with Build.SourceVersion as TAG
         steps:
-          - bash: |
-              echo $(AZURE_COSMOS_URI_DEV) | sed 's/./& /g'
-            displayName: "DEBUG TO REMOVE"
-
           - template: templates/docker-release/template.yaml@pagopaCommons
             parameters:
               CONTAINER_REGISTRY_SERVICE_CONN: $(DEV_CONTAINER_REGISTRY_SERVICE_CONN)
