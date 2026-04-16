@@ -13,9 +13,6 @@ const {
 
 async function main() {
 
-    console.log('URI: ' + AZURE_COSMOS_URI.slice(0, 4) + ' ' + AZURE_COSMOS_URI.length);
-    console.log('TOKEN: ' + AZURE_COSMOS_KEY.length);
-
     const client = new CosmosClient({
         endpoint: AZURE_COSMOS_URI,
         key: AZURE_COSMOS_KEY
@@ -48,5 +45,5 @@ async function main() {
 
 main().catch((err) => {
     console.error(err);
-    process.exit(1);
+    process.exit(-1);
 });
