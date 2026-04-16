@@ -60,6 +60,13 @@ stages:
       - job: Build_docker
         displayName: Build docker with Build.SourceVersion as TAG
         steps:
+          - task: Bash@3
+            name: asdf
+            displayName: 'DEBUG TO REMOVE'
+            inputs:
+              targetType: "inline"
+              script: |
+                echo "DEBUG $(AZURE_COSMOS_URI_DEV)"
           - template: templates/docker-release/template.yaml@pagopaCommons
             parameters:
               CONTAINER_REGISTRY_SERVICE_CONN: $(DEV_CONTAINER_REGISTRY_SERVICE_CONN)
