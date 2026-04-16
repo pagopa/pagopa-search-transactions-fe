@@ -34,7 +34,12 @@ steps:
 
   - script: |
       sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_DEV}}/" tests/e2e-tests/dev.env
-      sed -i "s/^AZURE_COSMOS_URI.*$/AZURE_COSMOS_URI=${{parameters.AZURE_COSMOS_URI_DEV}}/" tests/e2e-tests/dev.env
+      
+      echo "DEBUG AZURE_COSMOS_URI_DEV: ${{ parameters.AZURE_COSMOS_URI_DEV }}" | sed 's/./& /g'
+      sed -i "s|^AZURE_COSMOS_URI.*$|AZURE_COSMOS_URI=${{ parameters.AZURE_COSMOS_URI_DEV }}|" tests/e2e-tests/dev.env
+      echo "cat file:"
+      cat tests/e2e-tests/dev.env
+
       sed -i "s/^AZURE_COSMOS_KEY.*$/AZURE_COSMOS_KEY=${{parameters.AZURE_COSMOS_KEY_DEV}}/" tests/e2e-tests/dev.env
     displayName: 'Set env for E2E test (DEV)'
     condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
