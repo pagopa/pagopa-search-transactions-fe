@@ -12,6 +12,10 @@ const {
 } = process.env;
 
 async function main() {
+
+    console.log('URI: ' + AZURE_COSMOS_URI.slice(0, 4) + ' ' + AZURE_COSMOS_URI.length);
+    console.log('TOKEN: ' + AZURE_COSMOS_KEY.length);
+
     const client = new CosmosClient({
         endpoint: AZURE_COSMOS_URI,
         key: AZURE_COSMOS_KEY
