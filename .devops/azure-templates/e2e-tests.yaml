@@ -27,12 +27,6 @@ parameters:
 
 steps:
 
-  - script: sudo apt install -y nodejs npm
-    displayName: 'Install node'
-
-  - script: npm install yarn
-    displayName: 'Install yarn'
-
   - task: UseNode@1
     inputs:
       versionSource: 'fromFile'
