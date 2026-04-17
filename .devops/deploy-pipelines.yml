@@ -103,7 +103,7 @@ stages:
 
   - stage: "End_to_End_Tests_DEV"
     pool:
-      vmImage: 'ubuntu-latest'
+      name: pagopa-dev-linux
     dependsOn: [Deploy_for_DEV]
     jobs:
       - job: e2e_tests_dev
