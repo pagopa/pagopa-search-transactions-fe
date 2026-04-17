@@ -40,7 +40,7 @@ steps:
       yarn --version
     displayName: 'Enable yarn'
 
-  - script: yarn install --frozen-lockfile
+  - script: yarn install --immutable
     displayName: 'Install dependencies'
 
   - script: yarn playwright install --with-deps
