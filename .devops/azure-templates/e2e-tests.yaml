@@ -35,12 +35,12 @@ steps:
 
   - script: |
       corepack enable
-      corepack prepare yarn@stable --activate
+      corepack prepare yarn@1.22.22 --activate
       node --version
       yarn --version
     displayName: 'Enable yarn'
 
-  - script: yarn install --immutable
+  - script: yarn install --frozen-lockfile
     displayName: 'Install dependencies'
 
   - script: yarn playwright install --with-deps
