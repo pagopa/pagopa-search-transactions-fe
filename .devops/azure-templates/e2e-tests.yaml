@@ -27,7 +27,7 @@ parameters:
 
 steps:
 
-  - task: UseNode@1
+  - task: NodeTool@0
     inputs:
       versionSource: 'fromFile'
       versionFilePath: '.nvmrc'
