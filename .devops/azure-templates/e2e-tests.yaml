@@ -33,6 +33,19 @@ steps:
   - script: npm install yarn
     displayName: 'Install yarn'
 
+  - task: UseNode@1
+    inputs:
+      versionSource: 'fromFile'
+      versionFilePath: '.nvmrc'
+    displayName: 'Use Node from .nvmrc'
+
+  - script: |
+      corepack enable
+      corepack prepare yarn@stable --activate
+      node --version
+      yarn --version
+    displayName: 'Enable yarn'
+
   - script: yarn install --frozen-lockfile
     displayName: 'Install dependencies'
 
