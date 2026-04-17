@@ -27,7 +27,7 @@ parameters:
 
 steps:
 
-  - script: sudo apt install -y nodejs
+  - script: sudo apt install -y nodejs npm
     displayName: 'Install node'
 
   - script: npm install -g yarn
