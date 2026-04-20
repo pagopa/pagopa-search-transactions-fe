@@ -37,6 +37,31 @@ parameters:
       - False
       - True
 
+  - name: "ENVIRONMENT"
+    type: string
+    values:
+      - DEV
+      - UAT
+    default: DEV
+  - name: "SEARCH_TRANSACTIONS_TOKEN_DEV"
+    type: string
+    default: ''
+  - name: "SEARCH_TRANSACTIONS_TOKEN_UAT"
+    type: string
+    default: ''
+  - name: "AZURE_COSMOS_URI_DEV"
+    type: string
+    default: ''
+  - name: "AZURE_COSMOS_URI_UAT"
+    type: string
+    default: ''
+  - name: "AZURE_COSMOS_KEY_DEV"
+    type: string
+    default: ''
+  - name: "AZURE_COSMOS_KEY_UAT"
+    type: string
+    default: ''
+
 resources:
   repositories:
     - repository: pagopaCommons
