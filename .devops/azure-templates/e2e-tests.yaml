@@ -27,19 +27,6 @@ parameters:
 
 steps:
 
-  - task: NodeTool@0
-    inputs:
-      versionSource: 'fromFile'
-      versionFilePath: '.nvmrc'
-    displayName: 'Use Node from .nvmrc'
-
-  - script: |
-      corepack enable
-      corepack prepare yarn@1.22.22 --activate
-      node --version
-      yarn --version
-    displayName: 'Enable yarn'
-
   - script: yarn install --frozen-lockfile
     displayName: 'Install dependencies'
 
@@ -59,21 +46,11 @@ steps:
       sed -i "s/^AZURE_COSMOS_KEY.*$/AZURE_COSMOS_KEY=${{parameters.AZURE_COSMOS_KEY_UAT}}/" tests/e2e-tests/uat.env
     displayName: 'Set env for E2E test (UAT)'
     condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'UAT'))
-
-  - script: yarn seed-e2e-dev
-    displayName: 'Seed for E2E tests DEV'
-    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
-    continueOnError: false
   
   - script: yarn e2e-tests-dev
     displayName: 'Playwright E2E tests DEV'
     condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
     continueOnError: true
-
-  # - script: yarn cleanup-e2e-dev
-  #   displayName: 'Clean Up for E2E tests DEV'
-  #   condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
-  #   continueOnError: true
 
   - script: yarn seed-e2e-uat
     displayName: 'Seed for E2E tests UAT'
