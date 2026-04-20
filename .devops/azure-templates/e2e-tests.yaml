@@ -70,10 +70,10 @@ steps:
     condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
     continueOnError: true
 
-  - script: yarn cleanup-e2e-dev
-    displayName: 'Clean Up for E2E tests DEV'
-    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
-    continueOnError: true
+  # - script: yarn cleanup-e2e-dev
+  #   displayName: 'Clean Up for E2E tests DEV'
+  #   condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
+  #   continueOnError: true
 
   - script: yarn seed-e2e-uat
     displayName: 'Seed for E2E tests UAT'
