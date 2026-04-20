@@ -37,31 +37,6 @@ parameters:
       - False
       - True
 
-  - name: "ENVIRONMENT"
-    type: string
-    values:
-      - DEV
-      - UAT
-    default: DEV
-  - name: "SEARCH_TRANSACTIONS_TOKEN_DEV"
-    type: string
-    default: ''
-  - name: "SEARCH_TRANSACTIONS_TOKEN_UAT"
-    type: string
-    default: ''
-  - name: "AZURE_COSMOS_URI_DEV"
-    type: string
-    default: ''
-  - name: "AZURE_COSMOS_URI_UAT"
-    type: string
-    default: ''
-  - name: "AZURE_COSMOS_KEY_DEV"
-    type: string
-    default: ''
-  - name: "AZURE_COSMOS_KEY_UAT"
-    type: string
-    default: ''
-
 resources:
   repositories:
     - repository: pagopaCommons
@@ -129,37 +104,7 @@ stages:
   - stage: "End_to_End_Tests_DEV"
     dependsOn: [Deploy_for_DEV]
     jobs:
-      - job: seed_e2e_tests_dev
-        pool:
-          name: pagopa-dev-linux
-        steps:
-        - task: NodeTool@0
-          inputs:
-            versionSource: 'fromFile'
-            versionFilePath: '.nvmrc'
-          displayName: 'Use Node from .nvmrc'
-
-        - script: |
-            corepack enable
-            corepack prepare yarn@1.22.22 --activate
-            node --version
-            yarn --version
-          displayName: 'Enable yarn'
-
-        - script: |
-            sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_DEV}}/" tests/e2e-tests/dev.env
-            sed -i "s|^AZURE_COSMOS_URI.*$|AZURE_COSMOS_URI=${{parameters.AZURE_COSMOS_URI_DEV}}|" tests/e2e-tests/dev.env
-            sed -i "s/^AZURE_COSMOS_KEY.*$/AZURE_COSMOS_KEY=${{parameters.AZURE_COSMOS_KEY_DEV}}/" tests/e2e-tests/dev.env
-          displayName: 'Set env for E2E test (DEV)'
-          condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
-
-        - script: yarn seed-e2e-dev
-          displayName: 'Seed for E2E tests DEV'
-          condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
-          continueOnError: false
-
       - job: e2e_tests_dev
-        dependsOn: seed_e2e_tests_dev
         steps:
         - template: azure-templates/e2e-tests.yaml
           parameters:
@@ -168,35 +113,6 @@ stages:
             AZURE_COSMOS_URI_DEV: $(AZURE_COSMOS_URI_DEV)
             AZURE_COSMOS_KEY_DEV: $(AZURE_COSMOS_KEY_DEV)
 
-      - job: cleanup_e2e_tests_dev
-        dependsOn: e2e_tests_dev
-        pool:
-          name: pagopa-dev-linux
-        steps:
-        - task: NodeTool@0
-          inputs:
-            versionSource: 'fromFile'
-            versionFilePath: '.nvmrc'
-          displayName: 'Use Node from .nvmrc'
-
-        - script: |
-            corepack enable
-            corepack prepare yarn@1.22.22 --activate
-            node --version
-            yarn --version
-          displayName: 'Enable yarn'
-
-        - script: |
-            sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_DEV}}/" tests/e2e-tests/dev.env
-            sed -i "s|^AZURE_COSMOS_URI.*$|AZURE_COSMOS_URI=${{parameters.AZURE_COSMOS_URI_DEV}}|" tests/e2e-tests/dev.env
-            sed -i "s/^AZURE_COSMOS_KEY.*$/AZURE_COSMOS_KEY=${{parameters.AZURE_COSMOS_KEY_DEV}}/" tests/e2e-tests/dev.env
-          displayName: 'Set env for E2E test (DEV)'
-          condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
-
-        - script: yarn cleanup-e2e-dev
-          displayName: 'Clean Up for E2E tests DEV'
-          condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
-          continueOnError: true
   # --- END Deploy DEV --- #
 
   # --- START Deploy UAT --- #
