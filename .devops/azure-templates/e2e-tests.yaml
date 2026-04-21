@@ -41,7 +41,7 @@ jobs:
       corepack prepare yarn@1.22.22 --activate
       node --version
       yarn --version
-      yarn install --frozen-lockfile
+      yarn add dotenv
     displayName: 'Enable yarn'
 
   - script: |
@@ -123,6 +123,7 @@ jobs:
       corepack prepare yarn@1.22.22 --activate
       node --version
       yarn --version
+      yarn add dotenv
     displayName: 'Enable yarn'
 
   - script: |
