@@ -41,6 +41,7 @@ jobs:
       corepack prepare yarn@1.22.22 --activate
       node --version
       yarn --version
+      yarn install --frozen-lockfile
     displayName: 'Enable yarn'
 
   - script: |
