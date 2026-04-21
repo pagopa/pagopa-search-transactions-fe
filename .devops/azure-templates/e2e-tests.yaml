@@ -25,114 +25,113 @@ parameters:
     type: string
     default: ''
 
-  - stage: "Settings_End_to_End_Tests_DEV"
-    jobs:
-    - job: seed_e2e_tests_dev
-      pool:
-        name: pagopa-dev-linux
-      steps:
-      - task: NodeTool@0
-        inputs:
-          versionSource: 'fromFile'
-          versionFilePath: '.nvmrc'
-        displayName: 'Use Node from .nvmrc'
+jobs:
+- job: seed_e2e_tests_dev
+  pool:
+    name: pagopa-dev-linux
+  steps:
+  - task: NodeTool@0
+    inputs:
+      versionSource: 'fromFile'
+      versionFilePath: '.nvmrc'
+    displayName: 'Use Node from .nvmrc'
 
-      - script: |
-          corepack enable
-          corepack prepare yarn@1.22.22 --activate
-          node --version
-          yarn --version
-        displayName: 'Enable yarn'
+  - script: |
+      corepack enable
+      corepack prepare yarn@1.22.22 --activate
+      node --version
+      yarn --version
+    displayName: 'Enable yarn'
 
-      - script: |
-          sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_DEV}}/" tests/e2e-tests/dev.env
-          sed -i "s|^AZURE_COSMOS_URI.*$|AZURE_COSMOS_URI=${{parameters.AZURE_COSMOS_URI_DEV}}|" tests/e2e-tests/dev.env
-          sed -i "s/^AZURE_COSMOS_KEY.*$/AZURE_COSMOS_KEY=${{parameters.AZURE_COSMOS_KEY_DEV}}/" tests/e2e-tests/dev.env
-        displayName: 'Set env for E2E test (DEV)'
-        condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
+  - script: |
+      sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_DEV}}/" tests/e2e-tests/dev.env
+      sed -i "s|^AZURE_COSMOS_URI.*$|AZURE_COSMOS_URI=${{parameters.AZURE_COSMOS_URI_DEV}}|" tests/e2e-tests/dev.env
+      sed -i "s/^AZURE_COSMOS_KEY.*$/AZURE_COSMOS_KEY=${{parameters.AZURE_COSMOS_KEY_DEV}}/" tests/e2e-tests/dev.env
+    displayName: 'Set env for E2E test (DEV)'
+    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
 
-      - script: yarn seed-e2e-dev
-        displayName: 'Seed for E2E tests DEV'
-        condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
-        continueOnError: false
+  - script: yarn seed-e2e-dev
+    displayName: 'Seed for E2E tests DEV'
+    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
+    continueOnError: false
 
-    - job: e2e_tests_dev
-      dependsOn: seed_e2e_tests_dev
-      steps:
+- job: e2e_tests_dev
+  dependsOn: seed_e2e_tests_dev
+  steps:
 
-      - script: yarn install --frozen-lockfile
-        displayName: 'Install dependencies'
+  - script: yarn install --frozen-lockfile
+    displayName: 'Install dependencies'
 
-      - script: yarn playwright install --with-deps
-        displayName: 'Install Playwright Browsers'
+  - script: yarn playwright install --with-deps
+    displayName: 'Install Playwright Browsers'
 
-      - script: |
-          sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_DEV}}/" tests/e2e-tests/dev.env
-          sed -i "s|^AZURE_COSMOS_URI.*$|AZURE_COSMOS_URI=${{parameters.AZURE_COSMOS_URI_DEV}}|" tests/e2e-tests/dev.env
-          sed -i "s/^AZURE_COSMOS_KEY.*$/AZURE_COSMOS_KEY=${{parameters.AZURE_COSMOS_KEY_DEV}}/" tests/e2e-tests/dev.env
-        displayName: 'Set env for E2E test (DEV)'
-        condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
-        
-      - script: |
-          sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_UAT}}/" tests/e2e-tests/uat.env
-          sed -i "s|^AZURE_COSMOS_URI.*$|AZURE_COSMOS_URI=${{parameters.AZURE_COSMOS_URI_UAT}}|" tests/e2e-tests/uat.env
-          sed -i "s/^AZURE_COSMOS_KEY.*$/AZURE_COSMOS_KEY=${{parameters.AZURE_COSMOS_KEY_UAT}}/" tests/e2e-tests/uat.env
-        displayName: 'Set env for E2E test (UAT)'
-        condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'UAT'))
-      
-      - script: yarn e2e-tests-dev
-        displayName: 'Playwright E2E tests DEV'
-        condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
-        continueOnError: true
+  - script: |
+      sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_DEV}}/" tests/e2e-tests/dev.env
+      sed -i "s|^AZURE_COSMOS_URI.*$|AZURE_COSMOS_URI=${{parameters.AZURE_COSMOS_URI_DEV}}|" tests/e2e-tests/dev.env
+      sed -i "s/^AZURE_COSMOS_KEY.*$/AZURE_COSMOS_KEY=${{parameters.AZURE_COSMOS_KEY_DEV}}/" tests/e2e-tests/dev.env
+    displayName: 'Set env for E2E test (DEV)'
+    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
+    
+  - script: |
+      sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_UAT}}/" tests/e2e-tests/uat.env
+      sed -i "s|^AZURE_COSMOS_URI.*$|AZURE_COSMOS_URI=${{parameters.AZURE_COSMOS_URI_UAT}}|" tests/e2e-tests/uat.env
+      sed -i "s/^AZURE_COSMOS_KEY.*$/AZURE_COSMOS_KEY=${{parameters.AZURE_COSMOS_KEY_UAT}}/" tests/e2e-tests/uat.env
+    displayName: 'Set env for E2E test (UAT)'
+    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'UAT'))
+  
+  - script: yarn e2e-tests-dev
+    displayName: 'Playwright E2E tests DEV'
+    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
+    continueOnError: true
 
-      - script: yarn seed-e2e-uat
-        displayName: 'Seed for E2E tests UAT'
-        condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'UAT'))
-        continueOnError: false
+  - script: yarn seed-e2e-uat
+    displayName: 'Seed for E2E tests UAT'
+    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'UAT'))
+    continueOnError: false
 
-      - script: yarn e2e-tests-uat
-        displayName: 'Playwright E2E tests UAT'
-        condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'UAT'))
-        continueOnError: true
+  - script: yarn e2e-tests-uat
+    displayName: 'Playwright E2E tests UAT'
+    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'UAT'))
+    continueOnError: true
 
-      - script: yarn cleanup-e2e-uat
-        displayName: 'Clean Up for E2E tests UAT'
-        condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'UAT'))
-        continueOnError: true
+  - script: yarn cleanup-e2e-uat
+    displayName: 'Clean Up for E2E tests UAT'
+    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'UAT'))
+    continueOnError: true
 
-      - task: PublishTestResults@2
-        inputs:
-          testResultsFormat: 'JUnit'
-          testResultsFiles: '**/*-TEST.xml'
-          searchFolder: '$(System.DefaultWorkingDirectory)'
-        condition: succeededOrFailed()
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/*-TEST.xml'
+      searchFolder: '$(System.DefaultWorkingDirectory)'
+    condition: succeededOrFailed()
 
-    - job: cleanup_e2e_tests_dev
-      dependsOn: e2e_tests_dev
-      pool:
-        name: pagopa-dev-linux
-      steps:
-      - task: NodeTool@0
-        inputs:
-          versionSource: 'fromFile'
-          versionFilePath: '.nvmrc'
-        displayName: 'Use Node from .nvmrc'
+- job: cleanup_e2e_tests_dev
+  dependsOn: e2e_tests_dev
+  pool:
+    name: pagopa-dev-linux
+  steps:
+  - task: NodeTool@0
+    inputs:
+      versionSource: 'fromFile'
+      versionFilePath: '.nvmrc'
+    displayName: 'Use Node from .nvmrc'
 
-      - script: |
-          corepack enable
-          corepack prepare yarn@1.22.22 --activate
-          node --version
-          yarn --version
-        displayName: 'Enable yarn'
+  - script: |
+      corepack enable
+      corepack prepare yarn@1.22.22 --activate
+      node --version
+      yarn --version
+    displayName: 'Enable yarn'
 
-      - script: |
-          sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_DEV}}/" tests/e2e-tests/dev.env
-          sed -i "s|^AZURE_COSMOS_URI.*$|AZURE_COSMOS_URI=${{parameters.AZURE_COSMOS_URI_DEV}}|" tests/e2e-tests/dev.env
-          sed -i "s/^AZURE_COSMOS_KEY.*$/AZURE_COSMOS_KEY=${{parameters.AZURE_COSMOS_KEY_DEV}}/" tests/e2e-tests/dev.env
-        displayName: 'Set env for E2E test (DEV)'
-        condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
+  - script: |
+      sed -i "s/^SEARCH_TRANSACTIONS_TOKEN.*$/SEARCH_TRANSACTIONS_TOKEN=${{parameters.SEARCH_TRANSACTIONS_TOKEN_DEV}}/" tests/e2e-tests/dev.env
+      sed -i "s|^AZURE_COSMOS_URI.*$|AZURE_COSMOS_URI=${{parameters.AZURE_COSMOS_URI_DEV}}|" tests/e2e-tests/dev.env
+      sed -i "s/^AZURE_COSMOS_KEY.*$/AZURE_COSMOS_KEY=${{parameters.AZURE_COSMOS_KEY_DEV}}/" tests/e2e-tests/dev.env
+    displayName: 'Set env for E2E test (DEV)'
+    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
 
-      - script: yarn cleanup-e2e-dev
-        displayName: 'Clean Up for E2E tests DEV'
-        condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
-        continueOnError: true
+  - script: yarn cleanup-e2e-dev
+    displayName: 'Clean Up for E2E tests DEV'
+    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'DEV'))
+    continueOnError: true
