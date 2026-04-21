@@ -20,7 +20,11 @@
     "playwright-integration-ui": "playwright test tests/integration-tests --ui",
     "e2e-tests-uat": "dotenv -e tests/e2e-tests/uat.env playwright test tests/e2e-tests",
     "e2e-tests-dev": "dotenv -e tests/e2e-tests/dev.env playwright test tests/e2e-tests",
-    "integration-tests": "dotenv -e tests/integration-tests/local.env playwright test tests/integration-tests"
+    "integration-tests": "dotenv -e tests/integration-tests/local.env playwright test tests/integration-tests",
+    "seed-e2e-dev": "dotenv -e tests/e2e-tests/dev.env node tests/e2e-tests/seed-test.js",
+    "seed-e2e-uat": "dotenv -e tests/e2e-tests/uat.env node tests/e2e-tests/seed-test.js",
+    "cleanup-e2e-dev": "dotenv -e tests/e2e-tests/dev.env node tests/e2e-tests/cleanup-test.js",
+    "cleanup-e2e-uat": "dotenv -e tests/e2e-tests/uat.env node tests/e2e-tests/cleanup-test.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -37,6 +41,7 @@
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@azure/cosmos": "^4.9.2",
     "@pagopa/openapi-codegen-ts": "^14.2.0",
     "@playwright/test": "^1.58.2",
     "@testing-library/dom": "^10.4.1",

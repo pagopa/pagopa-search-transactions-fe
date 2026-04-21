@@ -102,16 +102,15 @@ stages:
                     BLUE_VERSION: $(Build.SourceVersion)
 
   - stage: "End_to_End_Tests_DEV"
-    pool:
-      vmImage: 'ubuntu-latest'
     dependsOn: [Deploy_for_DEV]
     jobs:
-      - job: e2e_tests_dev
-        steps:
-        - template: azure-templates/e2e-tests.yaml
-          parameters:
-            ENVIRONMENT: DEV
-            SEARCH_TRANSACTIONS_TOKEN_DEV: $(SEARCH_TRANSACTIONS_TOKEN_DEV)
+      - template: azure-templates/e2e-tests.yaml
+        parameters:
+          ENVIRONMENT: DEV
+          SEARCH_TRANSACTIONS_TOKEN_DEV: $(SEARCH_TRANSACTIONS_TOKEN_DEV)
+          AZURE_COSMOS_URI_DEV: $(AZURE_COSMOS_URI_DEV)
+          AZURE_COSMOS_KEY_DEV: $(AZURE_COSMOS_KEY_DEV)
+
   # --- END Deploy DEV --- #
 
   # --- START Deploy UAT --- #
@@ -233,12 +232,12 @@ stages:
         vmImage: 'ubuntu-latest'
     dependsOn: [Deploy_UAT_Green]
     jobs:
-      - job: e2e_tests_uat
-        steps:
-        - template: azure-templates/e2e-tests.yaml
-          parameters:
-            ENVIRONMENT: UAT
-            SEARCH_TRANSACTIONS_TOKEN_UAT: $(SEARCH_TRANSACTIONS_TOKEN_UAT)
+      - template: azure-templates/e2e-tests.yaml
+        parameters:
+          ENVIRONMENT: UAT
+          SEARCH_TRANSACTIONS_TOKEN_UAT: $(SEARCH_TRANSACTIONS_TOKEN_UAT)
+          AZURE_COSMOS_URI_UAT: $(AZURE_COSMOS_URI_UAT)
+          AZURE_COSMOS_KEY_UAT: $(AZURE_COSMOS_KEY_UAT)
   # --- END Deploy UAT --- #
 
   # --- START Deploy PROD --- #
