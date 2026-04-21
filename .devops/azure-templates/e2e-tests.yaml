@@ -147,6 +147,11 @@ jobs:
     displayName: 'Set env for E2E test (UAT)'
     condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'UAT'))
 
+  - script: yarn seed-e2e-uat
+    displayName: 'Seed for E2E tests UAT'
+    condition: and(succeeded(), eq('${{parameters.ENVIRONMENT}}', 'UAT'))
+    continueOnError: false
+
 - job: e2e_tests_uat
   condition: eq('${{parameters.ENVIRONMENT}}', 'UAT')
   dependsOn: seed_e2e_tests_uat
