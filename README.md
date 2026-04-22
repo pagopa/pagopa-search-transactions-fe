@@ -167,4 +167,4 @@ then run:
     ```
 
 - N.B. 
-  All tests must have a NAV code prefix starting with '399' for the policy APIM due to the APIM policy blocking other NAVs.
+  All tests must have a NAV code prefix starting with '399' due to the APIM policy blocking other NAVs.
