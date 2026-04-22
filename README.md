@@ -165,3 +165,6 @@ then run:
     ```bash
     yarn playwright-e2e-ui
     ```
+
+- N.B. 
+  All tests must have a NAV code prefix starting with '399' due to the APIM policy blocking other NAVs.
