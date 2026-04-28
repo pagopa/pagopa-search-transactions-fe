@@ -43,6 +43,7 @@ next-env.d.ts
 
 test-report.xml
 /.idea/
+**/.terraform
 
 # generated code
 /generated
