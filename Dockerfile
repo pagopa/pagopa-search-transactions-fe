@@ -8,8 +8,10 @@ ARG NEXT_PUBLIC_CIE_SEARCH_API_BASE_PATH
 ENV NEXT_PUBLIC_CIE_SEARCH_API_BASE_URL=$NEXT_PUBLIC_CIE_SEARCH_API_BASE_URL
 ENV NEXT_PUBLIC_CIE_SEARCH_API_BASE_PATH=$NEXT_PUBLIC_CIE_SEARCH_API_BASE_PATH
 
-COPY package*.json ./
-RUN yarn install --frozen-lockfile
+# Copy the lockfile before installation so the Docker build uses the same
+# dependency versions as local development and CI, without updating the lockfile.
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile --non-interactive
 COPY . .
 RUN yarn build
 
