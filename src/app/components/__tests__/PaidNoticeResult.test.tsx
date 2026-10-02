@@ -3,12 +3,12 @@ import { screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import PaidNoticeResult from '../PaidNoticeResult';
-import type { CiePaidNoticeDetail } from '../../types/CieSearch';
+import type { CartItem } from '../../../../generated/definitions/biz-events-search-transactions-v1/CartItem';
 import { renderWithProviders } from './test-utils';
 
 describe('PaidNoticeResult', () => {
-  const baseDetail: CiePaidNoticeDetail = {
-    amount: 10.5,
+  const baseDetail: CartItem = {
+    amount: '10.5',
     subject: 'Payment for service',
     payee: { name: 'Comune di Roma', taxCode: '12345678901' },
     debtor: { name: 'Mario Rossi', taxCode: 'RSSMRA80A01H501U' },
@@ -33,15 +33,17 @@ describe('PaidNoticeResult', () => {
     expect(screen.getByText(/10,50\s*€|€\s*10,50/)).toBeInTheDocument();
   });
 
-  it('shows fallbacks when optional fields are missing', () => {
-    const detail: CiePaidNoticeDetail = {
-        amount: undefined,
-        subject: undefined,
-        payee: { taxCode: 'AAAABBBBCCCCDDDD' },
-        debtor: { taxCode: 'EEEEFFFFGGGGHHHH' },
-        refNumberType: undefined,
-        refNumberValue: undefined,
-    };
+  it('shows fallbacks when required fields are missing from malformed data', () => {
+	// Intentionally violate the API contract to test defensive rendering
+	// when required fields are missing.
+	const detail = {
+	  amount: undefined,
+	  subject: undefined,
+	  payee: { taxCode: 'AAAABBBBCCCCDDDD' },
+	  debtor: { taxCode: 'EEEEFFFFGGGGHHHH' },
+	  refNumberType: undefined,
+	  refNumberValue: undefined,
+	} as unknown as CartItem;
 
     renderWithProviders(<PaidNoticeResult detail={detail} />);
 
