@@ -1,7 +1,7 @@
 apiVersion: v2
 type: application
-version: 2.9.1
-appVersion: "0.2.1"
+version: 2.9.2
+appVersion: "0.2.2"
 name: pagopa-search-transactions-fe
 description: React Typescript frontend application designed to support CIE transactions payment
 dependencies:

@@ -4,7 +4,7 @@ microservice-chart:
   fullnameOverride: "pagopa-search-transactions-fe"
   image:
     repository: pagopapcommonacr.azurecr.io/pagopasearchtransactionsfe
-    tag: "0.2.1"
+    tag: "0.2.2"
     pullPolicy: Always
   livenessProbe:
     handlerType: httpGet
